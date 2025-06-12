@@ -1,11 +1,6 @@
 // index.cjs
 const {DynamoDBClient} = require('@aws-sdk/client-dynamodb');
-const {
-    ResponseFactory, QueryParser,
-    DynamoDBDeviceRepository, DynamoDBWeatherRepository,
-    WeatherService, DeviceService
-} = require('bcfreeflight');
-
+const {ResponseFactory, QueryParser, DynamoDBDeviceRepository, DynamoDBWeatherRepository, WeatherService, DeviceService} = require('bcfreefree');
 
 // Table names
 const deviceTable = "BCFF_Devices";
@@ -21,17 +16,7 @@ const weatherService = new WeatherService(weatherRepository);
 const deviceService = new DeviceService(deviceRepository);
 
 // Lambda handler
-/**
- * Handles an HTTP request to validate a device and save weather data based on the provided query parameters.
- *
- * @param {Object} event - The event object containing details of the HTTP request, including queryStringParameters.
- * @return {Promise<Object>} Returns a formatted HTTP response object with a status code and message.
- *                           A 200 status code is returned if the operation is successful.
- *                           A 400 status code is returned if the `uploadKey` is missing or invalid.
- *                           Throws an error with a 500 status code for internal server errors.
- */
 const handler = async (event) => {
-
     console.log(event.isBase64Encoded);
     console.log(event.body);
     const uploadKey = queryParser.getParam(event.queryStringParameters, "uploadKey");
@@ -57,4 +42,4 @@ const handler = async (event) => {
     }
 };
 
-export {handler};
+module.exports = { handler };
