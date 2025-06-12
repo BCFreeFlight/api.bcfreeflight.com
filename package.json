@@ -16,7 +16,6 @@
     "@types/node": "^20.11.0",
     "esbuild": "^0.25.5",
     "esbuild-plugin-node-externals": "^1.0.1",
-    "module-alias": "^2.2.3",
     "tsx": "^4.20.2",
     "typedoc": "^0.28.5",
     "typescript": "^5.8.3"
@@ -26,8 +25,5 @@
     "@aws-sdk/lib-dynamodb": "^3.828.0",
     "@aws-sdk/util-dynamodb": "^3.828.0",
     "nanoid": "^5.1.5"
-  },
-  "_moduleAliases": {
-    "bcfreeflight": "dist/bundle.js"
   }
 }

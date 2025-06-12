@@ -2,20 +2,13 @@
   "name": "lambda",
   "version": "1.0.0",
   "description": "",
-  "main": "index.cjs",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "devDependencies": {
-    "@types/node": "^20.11.0",
-    "module-alias": "^2.2.3"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/BCFreeFlight/api.bcfreeflight.com.git"
   },
-  "private": true,
-  "_moduleAliases": {
-    "bcfreeflight": "dist/bundle.js"
-  }
+  "private": true
 }

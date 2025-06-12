@@ -36,3 +36,31 @@ await build({
 execSync(`cd ${distDir} && zip -r ${zipFile} .`, { stdio: 'inherit' });
 
 console.log(`✅ Build complete. Zip created at: ${zipFile}`);
+
+// --- Symlink creation for bcfreeflight.js ---
+const symlinkTarget = path.join(distDir, 'bundle.js');
+const symlinkLocation = path.join('node_modules', 'bcfreeflight.js');
+
+// Remove existing symlink or file
+if (fs.existsSync(symlinkLocation)) {
+    try {
+        const stat = fs.lstatSync(symlinkLocation);
+        if (stat.isSymbolicLink() || stat.isFile()) {
+            fs.unlinkSync(symlinkLocation);
+        } else {
+            throw new Error(`${symlinkLocation} exists and is not a file or symlink.`);
+        }
+    } catch (err) {
+        console.error(`Failed to remove existing ${symlinkLocation}:`, err);
+        process.exit(1);
+    }
+}
+
+// Create new symlink
+try {
+    fs.symlinkSync(path.relative(path.dirname(symlinkLocation), symlinkTarget), symlinkLocation);
+    console.log(`✅ Symlink created: ${symlinkLocation} -> ${symlinkTarget}`);
+} catch (err) {
+    console.error(`Failed to create symlink ${symlinkLocation} -> ${symlinkTarget}:`, err);
+    process.exit(1);
+}
