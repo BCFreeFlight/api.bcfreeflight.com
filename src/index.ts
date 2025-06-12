@@ -1,8 +1,10 @@
 // index.ts
-export {ResponseHandler} from './response-handler';
-export {QueryParser} from './query-parser';
-export {DynamoDBDeviceRepository} from './device-repository';
-export {DynamoDBWeatherRepository} from './weather-repository';
-export {WeatherService} from './weather-service';
-export {DeviceService} from './device-service';
-export {DeviceRepository, WeatherRepository} from './types/interfaces';
+export {ResponseHandler} from './ResponseHandler';
+export {QueryParser} from './QueryParser';
+export {DynamoDBDeviceRepository} from './DynamoDBDeviceRepository';
+export {DynamoDBWeatherRepository} from './DynamoDBWeatherRepository';
+export {WeatherService} from './WeatherService';
+export {DeviceService} from './DeviceService';
+export {IDeviceRepository} from './interfaces/IDeviceRepository';
+export {IWeatherRepository} from './interfaces/IWeatherRepository';
+export {IQueryParser} from './interfaces/IQueryParser';

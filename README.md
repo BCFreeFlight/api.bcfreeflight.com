@@ -6,7 +6,7 @@ This project has been migrated from JavaScript (.mjs) to TypeScript to provide b
 
 ## Project Structure
 
-- `src/types/interfaces.ts` - Contains all interfaces for dependency injection
+- `src/types/IWeatherDataInput.ts` - Contains all interfaces for dependency injection
 - `src/*.ts` - TypeScript source files
 - `dist/` - Build output directory
 
