@@ -1,6 +1,6 @@
 // index.mjs
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
-import {LambdaResponseFactory, QueryParser, DeviceRepository, WeatherRepository, WeatherService, DeviceService} from "bcfreeflight";
+import {LambdaResponseFactory, QueryParser, DynamoDBDeviceRepository, DynamoDBWeatherRepository, WeatherService, DeviceService} from "bcfreeflight";
 
 // Table names
 const deviceTable = "BCFF_Devices";
@@ -10,8 +10,8 @@ const weatherTable = "BCFF_Weather";
 const dbClient = new DynamoDBClient({region: process.env.AWS_REGION});
 const lambdaResponseFactory = new LambdaResponseFactory();
 const queryParser = new QueryParser();
-const deviceRepository = new DeviceRepository(dbClient, deviceTable);
-const weatherRepository = new WeatherRepository(dbClient, weatherTable);
+const deviceRepository = new DynamoDBDeviceRepository(dbClient, deviceTable);
+const weatherRepository = new DynamoDBWeatherRepository(dbClient, weatherTable);
 const weatherService = new WeatherService(weatherRepository);
 const deviceService = new DeviceService(deviceRepository);
 
