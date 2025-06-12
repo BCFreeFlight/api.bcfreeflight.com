@@ -30,6 +30,10 @@ The project now uses TypeScript interfaces for dependency injection, allowing fo
 - `DeviceRepository` - For device data access
 - `WeatherRepository` - For weather data operations
 
+## Documentation
+
+API documentation is available in the `docs/` directory. You can view it by opening `docs/index.html` in your browser.
+
 ## Development
 
 1. Make changes to TypeScript files in the `src/` directory

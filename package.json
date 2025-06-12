@@ -5,7 +5,8 @@
   "main": "dist/bundle.js",
   "scripts": {
     "build": "tsx scripts/build.ts",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "docs": "typedoc src/"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
     "esbuild": "^0.25.5",
     "esbuild-plugin-node-externals": "^1.0.1",
     "tsx": "^4.20.2",
+    "typedoc": "^0.28.5",
     "typescript": "^5.8.3"
   },
   "dependencies": {
