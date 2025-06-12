@@ -4,15 +4,19 @@
   "description": "",
   "main": "dist/bundle.js",
   "scripts": {
-    "build": "node scripts/build.js"
+    "build": "tsx scripts/build.ts",
+    "type-check": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@types/node": "^20.11.0",
     "esbuild": "^0.25.5",
-    "esbuild-plugin-node-externals": "^1.0.1"
+    "esbuild-plugin-node-externals": "^1.0.1",
+    "tsx": "^4.20.2",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.828.0",

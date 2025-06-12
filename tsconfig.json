@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                     // Needed for top-level await
+    "module": "ESNext",                     // Also needed for top-level await
+    "moduleResolution": "Node",
+    "esModuleInterop": true,                // Fixes the `import fs from 'fs'` error
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "build"                       // Optional, for compiled output
+  },
+  "include": ["src", "scripts"],
+  "exclude": ["node_modules", "dist", "artifacts"]
+}
