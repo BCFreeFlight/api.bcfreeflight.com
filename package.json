@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/bundle.js",
   "scripts": {
-    "build": "tsc --noEmit && tsx scripts/build.ts && npm run docs",
+    "build": "npm run type-check && tsx scripts/build.ts && npm run docs",
     "type-check": "tsc --noEmit",
     "docs": "typedoc src/"
   },

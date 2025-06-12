@@ -13,8 +13,8 @@ export {IDeviceService} from './interfaces/IDeviceService';
 export {IWeatherDataInput} from './interfaces/IWeatherDataInput';
 
 // Data repositories
-export {DynamoDBDeviceRepository} from './data/DynamoDBDeviceRepository';
-export {DynamoDBWeatherRepository} from './data/DynamoDBWeatherRepository';
+export {DynamoDBDeviceRepository as DeviceRepository} from './data/DynamoDBDeviceRepository';
+export {DynamoDBWeatherRepository as WeatherRepository} from './data/DynamoDBWeatherRepository';
 
 // Services
 export {WeatherService} from './services/WeatherService';
