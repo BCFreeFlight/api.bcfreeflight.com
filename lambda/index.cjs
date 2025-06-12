@@ -1,1 +1,2 @@
-require('module-alias/register')
+require('module-alias/register');
+require('bcfreefree');
