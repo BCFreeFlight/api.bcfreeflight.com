@@ -10,5 +10,5 @@
     "outDir": "build"                       // Optional, for compiled output
   },
   "include": ["src", "scripts"],
-  "exclude": ["node_modules", "dist", "artifacts"]
+  "exclude": ["node_modules", "dist", "artifacts", "docs"]
 }
