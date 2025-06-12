@@ -7,7 +7,7 @@ import {IWeatherRepository} from '../interfaces/IWeatherRepository';
 /**
  * @inheritDoc
  */
-export class DynamoDBWeatherRepository implements IWeatherRepository {
+export class AwsDynamoDBWeatherRepository implements IWeatherRepository {
     /**
      * @inheritDoc
      */

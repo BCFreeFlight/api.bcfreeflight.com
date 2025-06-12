@@ -1,20 +1,18 @@
 // index.ts
 // HTTP
-export {LambdaResponseFactory} from './http/LambdaResponseFactory';
-export {ApiResponse} from './http/ApiResponse';
+export {AwsLambdaResponseFactory} from './http/AwsLambdaResponseFactory';
+export {AwsLambdaApiResponse} from './http/AwsLambdaApiResponse';
 
 // Interfaces
-export {IResponseFactory} from './interfaces/IResponseFactory';
 export {IDeviceRepository} from './interfaces/IDeviceRepository';
 export {IWeatherRepository} from './interfaces/IWeatherRepository';
 export {IQueryParser} from './interfaces/IQueryParser';
-export {IApiResponse} from './interfaces/IApiResponse';
 export {IDeviceService} from './interfaces/IDeviceService';
 export {IWeatherDataInput} from './interfaces/IWeatherDataInput';
 
 // Data repositories
-export {DynamoDBDeviceRepository} from './data/DynamoDBDeviceRepository';
-export {DynamoDBWeatherRepository} from './data/DynamoDBWeatherRepository';
+export {AwsDynamoDBDeviceRepository} from './data/AwsDynamoDBDeviceRepository';
+export {AwsDynamoDBWeatherRepository} from './data/AwsDynamoDBWeatherRepository';
 
 // Services
 export {WeatherService} from './services/WeatherService';

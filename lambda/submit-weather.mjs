@@ -1,6 +1,6 @@
 // index.mjs
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
-import {LambdaResponseFactory, QueryParser, DynamoDBDeviceRepository, DynamoDBWeatherRepository, WeatherService, DeviceService} from "bcfreeflight";
+import {AwsLambdaResponseFactory, QueryParser, DynamoDBDeviceRepository, DynamoDBWeatherRepository, WeatherService, DeviceService} from "bcfreeflight";
 
 // Table names
 const deviceTable = "BCFF_Devices";
@@ -8,7 +8,7 @@ const weatherTable = "BCFF_Weather";
 
 // Create dependencies
 const dbClient = new DynamoDBClient({region: process.env.AWS_REGION});
-const lambdaResponseFactory = new LambdaResponseFactory();
+const responseFactory = new AwsLambdaResponseFactory();
 const queryParser = new QueryParser();
 const deviceRepository = new DynamoDBDeviceRepository(dbClient, deviceTable);
 const weatherRepository = new DynamoDBWeatherRepository(dbClient, weatherTable);
@@ -32,23 +32,23 @@ const handler = async (event) => {
     const uploadKey = queryParser.getParam(event.queryStringParameters, "uploadKey");
 
     if (!uploadKey) {
-        return lambdaResponseFactory.createApiResponse(400, "Missing 'uploadKey' in query string.");
+        return responseFactory.createApiResponse(400, "Missing 'uploadKey' in query string.");
     }
 
     try {
         const device = await deviceService.getById(uploadKey);
         if (!device) {
-            return lambdaResponseFactory.createApiResponse(400, `Device with key '${uploadKey}' not found.`);
+            return responseFactory.createApiResponse(400, `Device with key '${uploadKey}' not found.`);
         }
         const payload = event.isBase64Encoded
             ? queryParser.parseBase64(event.body)
             : queryParser.parse(event.queryStringParameters);
 
         await weatherService.saveWeatherData(device, payload);
-        return lambdaResponseFactory.createApiResponse(200, "Success");
+        return responseFactory.createApiResponse(200, "Success");
     } catch (err) {
         console.error(err);
-        return lambdaResponseFactory.createApiResponse(500, `Internal server error: ${err.message}`);
+        return responseFactory.createApiResponse(500, `Internal server error: ${err.message}`);
     }
 };
 

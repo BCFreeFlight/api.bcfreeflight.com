@@ -7,7 +7,7 @@ import {IDeviceRepository} from '../interfaces/IDeviceRepository';
 /**
  * @inheritdoc
  */
-export class DynamoDBDeviceRepository implements IDeviceRepository {
+export class AwsDynamoDBDeviceRepository implements IDeviceRepository {
 
     /**
      * @inheritdoc
