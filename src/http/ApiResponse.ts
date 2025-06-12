@@ -1,9 +1,9 @@
-import {IApiResponse} from "./interfaces/IApiResponse";
+import {IApiResponse} from "../interfaces/IApiResponse";
 
 /**
  * @inheritdoc
  */
-class ApiResponse implements IApiResponse {
+export class ApiResponse implements IApiResponse {
     /**
      * @inheritdoc
      */
@@ -48,5 +48,3 @@ class ApiResponse implements IApiResponse {
         "Content-Type": "application/json"
     };
 }
-
-export {ApiResponse};

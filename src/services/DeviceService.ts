@@ -1,11 +1,11 @@
 // DeviceService.ts
-import {IDeviceRepository} from './interfaces/IDeviceRepository';
-import {IDeviceService} from "./interfaces/IDeviceService";
+import {IDeviceRepository} from '../interfaces/IDeviceRepository';
+import {IDeviceService} from "../interfaces/IDeviceService";
 
 /**
  * @inheritDoc
  */
-class DeviceService implements IDeviceService {
+export class DeviceService implements IDeviceService {
 
     /**
      * @inheritDoc
@@ -23,5 +23,3 @@ class DeviceService implements IDeviceService {
 
     private deviceRepository: IDeviceRepository;
 }
-
-export {DeviceService};

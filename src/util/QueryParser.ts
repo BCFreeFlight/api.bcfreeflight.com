@@ -1,11 +1,11 @@
 // QueryParser.ts
 import * as querystring from 'querystring';
-import {IQueryParser} from './interfaces/IQueryParser';
+import {IQueryParser} from '../interfaces/IQueryParser';
 
 /**
  * @inheritdoc
  */
-class QueryParser implements IQueryParser {
+export class QueryParser implements IQueryParser {
     /**
      * @inheritdoc
      */
@@ -45,7 +45,7 @@ class QueryParser implements IQueryParser {
     /**
      * @inheritdoc
      */
-    private getParam(params: Record<string, any>, key: string): any {
+     getParam(params: Record<string, any>, key: string): any {
         if (params === null) throw new Error("params cannot be null");
         if (key === null) throw new Error("key cannot be null");
         if (key === "") throw new Error("key cannot be empty");
@@ -67,5 +67,3 @@ class QueryParser implements IQueryParser {
         }
     }
 }
-
-export {QueryParser};

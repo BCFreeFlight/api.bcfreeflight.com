@@ -1,12 +1,12 @@
 // WeatherService.ts
 import {nanoid} from "nanoid";
-import {IWeatherDataInput} from "./interfaces/IWeatherDataInput";
-import {IWeatherRepository} from "./interfaces/IWeatherRepository";
+import {IWeatherDataInput} from "../interfaces/IWeatherDataInput";
+import {IWeatherRepository} from "../interfaces/IWeatherRepository";
 
 /**
  * @inheritDoc
  */
-class WeatherService {
+export class WeatherService {
     private weatherRepository: IWeatherRepository;
 
     /**
@@ -36,5 +36,3 @@ class WeatherService {
         return await this.weatherRepository.saveWeatherData(payload);
     }
 }
-
-export {WeatherService};

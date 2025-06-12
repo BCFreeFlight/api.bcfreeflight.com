@@ -2,12 +2,12 @@
 import {GetItemCommand, DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {unmarshall} from "@aws-sdk/util-dynamodb";
 import {DynamoDBDocumentClient} from '@aws-sdk/lib-dynamodb';
-import {IDeviceRepository} from './interfaces/IDeviceRepository';
+import {IDeviceRepository} from '../interfaces/IDeviceRepository';
 
 /**
  * @inheritdoc
  */
-class DynamoDBDeviceRepository implements IDeviceRepository {
+export class DynamoDBDeviceRepository implements IDeviceRepository {
 
     /**
      * @inheritdoc
@@ -38,8 +38,6 @@ class DynamoDBDeviceRepository implements IDeviceRepository {
         return result.Item ? (unmarshall(result.Item) || null) : null;
     }
 
-    private client: DynamoDBDocumentClient;
+    private readonly client: DynamoDBDocumentClient;
     private readonly tableName: string;
 }
-
-export {DynamoDBDeviceRepository};

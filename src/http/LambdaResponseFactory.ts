@@ -1,16 +1,16 @@
-// ResponseHandler.ts
-import {IApiResponse} from "./interfaces/IApiResponse";
-import {IResponseHandler} from "./interfaces/IResponseHandler";
+// LambdaResponseFactory.ts
+import {IApiResponse} from "../interfaces/IApiResponse";
+import {IResponseFactory} from "../interfaces/IResponseFactory";
 import {ApiResponse} from "./ApiResponse";
 
 /**
  * @inheritDoc
  */
-class ResponseHandler implements IResponseHandler {
+export class LambdaResponseFactory implements IResponseFactory {
     /**
      * @inheritDoc
      */
-    handle(statusCode: number, response: any): IApiResponse {
+    createApiResponse(statusCode: number, response: any): IApiResponse {
         const isPrimitive = response === null ||
             typeof response !== 'object';
 
@@ -21,5 +21,3 @@ class ResponseHandler implements IResponseHandler {
         return new ApiResponse(statusCode, false, JSON.stringify(responseBody));
     }
 }
-
-export {ResponseHandler, ApiResponse};

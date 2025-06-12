@@ -6,7 +6,7 @@ import { IApiResponse } from "./IApiResponse";
  * This interface defines the contract for classes that transform
  * raw response data into structured API responses.
  */
-export interface IResponseHandler {
+export interface IResponseFactory {
     /**
      * Handles the raw response data and converts it to a structured API response.
      *
@@ -14,5 +14,5 @@ export interface IResponseHandler {
      * @param response - The raw response data to be processed.
      * @returns A structured API response object.
      */
-    handle(statusCode: number, response: any): IApiResponse;
+    createApiResponse(statusCode: number, response: any): IApiResponse;
 }
