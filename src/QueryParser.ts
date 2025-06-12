@@ -2,8 +2,6 @@
 import * as querystring from 'querystring';
 import {IQueryParser} from './interfaces/IQueryParser';
 
-type Params = Record<string, any>;
-
 /**
  * @inheritdoc
  */
@@ -11,11 +9,11 @@ class QueryParser implements IQueryParser {
     /**
      * @inheritdoc
      */
-    parse(params: Params): Params {
+    parse(params: Record<string, any>): Record<string, any> {
         if (params === null) throw new Error("params cannot be null");
         if (typeof params !== 'object') return {};
 
-        const parsed: Params = {};
+        const parsed: Record<string, any> = {};
         for (const [key, value] of Object.entries(params)) {
             this.toDictionary(key, value, parsed);
         }
@@ -26,14 +24,14 @@ class QueryParser implements IQueryParser {
     /**
      * @inheritdoc
      */
-    parseBase64(base64Body: string): Params {
+    parseBase64(base64Body: string): Record<string, any> {
         try {
             if (!base64Body) return {};
 
             const decoded = Buffer.from(base64Body, 'base64').toString('utf-8');
             const parsedRaw = querystring.parse(decoded);
 
-            const parsed: Params = {};
+            const parsed: Record<string, any> = {};
             for (const [key, value] of Object.entries(parsedRaw)) {
                 this.toDictionary(key, value, parsed);
             }
@@ -47,7 +45,7 @@ class QueryParser implements IQueryParser {
     /**
      * @inheritdoc
      */
-    getParam(params: Params, key: string): any {
+    private getParam(params: Record<string, any>, key: string): any {
         if (params === null) throw new Error("params cannot be null");
         if (key === null) throw new Error("key cannot be null");
         if (key === "") throw new Error("key cannot be empty");
@@ -57,7 +55,7 @@ class QueryParser implements IQueryParser {
         return foundKey ? params[foundKey] : undefined;
     }
 
-    private toDictionary = (key: string, value: string | string[] | undefined, parsed: Params) => {
+    private toDictionary = (key: string, value: string | string[] | undefined, parsed: Record<string, any>) => {
         if (key.toLowerCase() === 'uploadkey') return;
         if (typeof value === 'string') {
             const numberVal = parseFloat(value);

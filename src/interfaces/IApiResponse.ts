@@ -12,8 +12,8 @@
  * - `headers`: A key-value pair object representing the HTTP headers of the response.
  */
 export interface IApiResponse {
-    statusCode: number;
-    isBase64Encoded: boolean;
-    body: string;
-    headers: Record<string, string>;
+    readonly statusCode: number;
+    readonly isBase64Encoded: boolean;
+    readonly body: string;
+    readonly headers: Record<string, string>;
 }
