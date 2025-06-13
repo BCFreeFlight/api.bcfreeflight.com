@@ -3,7 +3,7 @@ import nodeExternalsPlugin from 'esbuild-plugin-node-externals';
 import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
-
+import { processInheritDoc } from './processInheritDoc';
 // Setup paths
 const distDir = path.resolve('dist');
 const artifactsDir = path.resolve('artifacts');
@@ -39,6 +39,9 @@ await build({
 execSync(`cd ${distDir} && zip -r ${zipFile} .`, { stdio: 'inherit' });
 
 console.log(`✅ Build complete. Zip created at: ${zipFile}`);
+
+// Process @inheritDoc comments in the bundle
+await processInheritDoc(path.join(distDir, 'bundle.js'));
 
 // --- Symlink creation for bcfreeflight.js ---
 const symlinkTarget = path.join(distDir, 'bundle.js');
