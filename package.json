@@ -17,7 +17,6 @@
     "@types/node": "^20.11.0",
     "esbuild": "^0.25.5",
     "esbuild-plugin-node-externals": "^1.0.1",
-    "glob": "^10.3.10",
     "tsx": "^4.20.2",
     "typedoc": "^0.28.5",
     "typescript": "^5.8.3"
