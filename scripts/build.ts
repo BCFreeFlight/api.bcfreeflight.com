@@ -30,6 +30,9 @@ await build({
         'nanoid'
     ],
     plugins: [nodeExternalsPlugin()],
+    keepNames: true,
+    minify: false,
+    legalComments: 'inline',
 });
 
 // Zip the result

@@ -15,7 +15,7 @@ export class QueryParser implements IQueryParser {
 
         const parsed: Record<string, any> = {};
         for (const [key, value] of Object.entries(params)) {
-            this._toDictionary(key, value, parsed);
+            this.toDictionary(key, value, parsed);
         }
         return parsed;
     }
@@ -33,7 +33,7 @@ export class QueryParser implements IQueryParser {
 
             const parsed: Record<string, any> = {};
             for (const [key, value] of Object.entries(parsedRaw)) {
-                this._toDictionary(key, value, parsed);
+                this.toDictionary(key, value, parsed);
             }
 
             return parsed;
@@ -45,7 +45,7 @@ export class QueryParser implements IQueryParser {
     /**
      * @inheritdoc
      */
-    getParam(params: Record<string, any>, key: string): any {
+     getParam(params: Record<string, any>, key: string): any {
         if (params === null) throw new Error("params cannot be null");
         if (key === null) throw new Error("key cannot be null");
         if (key === "") throw new Error("key cannot be empty");
@@ -55,7 +55,7 @@ export class QueryParser implements IQueryParser {
         return foundKey ? params[foundKey] : undefined;
     }
 
-    private _toDictionary(key: string, value: string | string[] | undefined, parsed: Record<string, any>): void {
+    private toDictionary = (key: string, value: string | string[] | undefined, parsed: Record<string, any>) => {
         if (key.toLowerCase() === 'uploadkey') return;
         if (typeof value === 'string') {
             const numberVal = parseFloat(value);
