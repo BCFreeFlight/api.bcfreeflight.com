@@ -3,11 +3,11 @@ import * as querystring from 'querystring';
 import {IQueryParser} from '../interfaces/IQueryParser';
 
 /**
- * @inheritdoc
+ * @inheritDoc
  */
 export class QueryParser implements IQueryParser {
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     parse(params: Record<string, any>): Record<string, any> {
         if (params === null) throw new Error("params cannot be null");
@@ -22,7 +22,7 @@ export class QueryParser implements IQueryParser {
 
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     parseBase64(base64Body: string): Record<string, any> {
         try {
@@ -43,7 +43,7 @@ export class QueryParser implements IQueryParser {
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
      getParam(params: Record<string, any>, key: string): any {
         if (params === null) throw new Error("params cannot be null");
