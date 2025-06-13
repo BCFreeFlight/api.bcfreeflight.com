@@ -10,35 +10,60 @@ import * as glob from 'glob';
 async function extractInterfaceDocumentation(srcDir: string): Promise<Map<string, string>> {
   const docMap = new Map<string, string>();
   const interfaceFiles = await glob.glob(path.join(srcDir, '**', 'interfaces', '*.ts'));
+  // Also search for service interfaces that might not be in the interfaces directory
+  const serviceInterfaceFiles = await glob.glob(path.join(srcDir, '**', '*Service.ts'));
 
-  for (const filePath of interfaceFiles) {
+  // Process all interface files (both standard interfaces and service interfaces)
+  const allInterfaceFiles = [...interfaceFiles, ...serviceInterfaceFiles];
+
+  for (const filePath of allInterfaceFiles) {
     const content = fs.readFileSync(filePath, 'utf8');
 
-    // Extract interface name
-    const interfaceMatch = content.match(/export\s+interface\s+(\w+)/);
-    if (!interfaceMatch) continue;
+    // Extract interface name(s) from the file
+    const interfaceMatches = [...content.matchAll(/export\s+interface\s+(\w+)/g)];
+    if (interfaceMatches.length === 0) continue;
 
-    const interfaceName = interfaceMatch[1];
+    for (const interfaceMatch of interfaceMatches) {
+      const interfaceName = interfaceMatch[1];
+      console.log(`Found interface: ${interfaceName} in ${path.basename(filePath)}`);
 
-    // Find all method documentation blocks
-    const methodDocs = content.match(/\/\*\*[\s\S]*?\*\/\s*([\w]+)\s*\([^)]*\)/g) || [];
+      // Find all method documentation blocks for this interface
+      // Look for the section after the interface declaration
+      const interfaceStartIndex = interfaceMatch.index;
+      const nextInterfaceIndex = content.indexOf('interface', interfaceStartIndex + 10);
+      const interfaceSection = nextInterfaceIndex > 0 
+        ? content.substring(interfaceStartIndex, nextInterfaceIndex)
+        : content.substring(interfaceStartIndex);
 
-    for (const methodDoc of methodDocs) {
-      // Extract method name
-      const methodNameMatch = methodDoc.match(/\*\/\s*([\w]+)\s*\(/);
-      if (!methodNameMatch) continue;
+      // Find methods within this interface section
+      const methodDocs = interfaceSection.match(/\/\*\*[\s\S]*?\*\/\s*([\w]+)\s*\([^)]*\)/g) || [];
 
-      const methodName = methodNameMatch[1];
-      const docComment = methodDoc.match(/\/\*\*([\s\S]*?)\*\//)![1];
+      for (const methodDoc of methodDocs) {
+        // Extract method name
+        const methodNameMatch = methodDoc.match(/\*\/\s*([\w]+)\s*\(/);
+        if (!methodNameMatch) continue;
 
-      // Store with interface.method signature for lookup
-      docMap.set(`${interfaceName}.${methodName}`, `/**${docComment}*/`);
-    }
+        const methodName = methodNameMatch[1];
+        const docComment = methodDoc.match(/\/\*\*([\s\S]*?)\*\//)![1];
 
-    // Also store the interface-level documentation
-    const interfaceDocMatch = content.match(/\/\*\*([\s\S]*?)\*\/\s*export\s+interface/);
-    if (interfaceDocMatch) {
-      docMap.set(interfaceName, `/**${interfaceDocMatch[1]}*/`);
+        // Store with interface.method signature for lookup
+        docMap.set(`${interfaceName}.${methodName}`, `/**${docComment}*/`);
+        console.log(`Added doc for method: ${interfaceName}.${methodName}`);
+      }
+
+      // Also store the interface-level documentation
+      const interfaceSectionStart = content.lastIndexOf('/**', interfaceStartIndex);
+      if (interfaceSectionStart >= 0) {
+        const interfaceDocComment = content.substring(
+          interfaceSectionStart, 
+          content.indexOf('*/', interfaceSectionStart) + 2
+        );
+        const interfaceDocMatch = interfaceDocComment.match(/\/\*\*([\s\S]*?)\*\//);
+        if (interfaceDocMatch) {
+          docMap.set(interfaceName, `/**${interfaceDocMatch[1]}*/`);
+          console.log(`Added doc for interface: ${interfaceName}`);
+        }
+      }
     }
   }
 
@@ -66,7 +91,7 @@ function processBundle(bundlePath: string, docMap: Map<string, string>): void {
 
   // Replace @inheritDoc comments
   bundleContent = bundleContent.replace(
-    /\/\*\*\s*\n\s*\*\s*@inheritdoc\s*\n\s*\*\/\s*(?:export\s+)?(?:class\s+(\w+)|constructor|\w+\s*\()/gi,
+    /\/\*\*\s*\n\s*\*\s*@inherit[dD]oc\s*\n?\s*\*\/\s*(?:export\s+)?(?:class\s+(\w+)|constructor|\w+\s*\()/gi,
     (match, className, offset) => {
       // Determine if this is a class, constructor, or method
       if (className) {
@@ -117,6 +142,23 @@ function processBundle(bundlePath: string, docMap: Map<string, string>): void {
 export async function processInheritDoc(bundlePath: string): Promise<void> {
   console.log(`Processing @inheritDoc comments in ${bundlePath}...`);
   const docMap = await extractInterfaceDocumentation('src');
+
+  // Debug: Log how many @inheritDoc instances are in the bundle before processing
+  const bundleContent = fs.readFileSync(bundlePath, 'utf8');
+  const inheritDocCount = (bundleContent.match(/@inherit[dD]oc/g) || []).length;
+  console.log(`Found ${inheritDocCount} @inheritDoc instances before processing`);
+
+  // Log documentation map keys for debugging
+  console.log(`Extracted documentation for ${docMap.size} symbols:`, Array.from(docMap.keys()));
+
   processBundle(bundlePath, docMap);
-  console.log(`✅ Successfully processed @inheritDoc comments in bundle`);
+
+  // Check if any @inheritDoc instances remain after processing
+  const processedContent = fs.readFileSync(bundlePath, 'utf8');
+  const remainingCount = (processedContent.match(/@inherit[dD]oc/g) || []).length;
+  if (remainingCount > 0) {
+    console.warn(`⚠️ Warning: ${remainingCount} @inheritDoc instances remain in the processed bundle`);
+  } else {
+    console.log(`✅ Successfully processed all @inheritDoc comments in bundle`);
+  }
 }
