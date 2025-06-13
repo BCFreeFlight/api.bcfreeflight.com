@@ -21,7 +21,7 @@ export {DeviceService} from './services/DeviceService';
 // Utilities
 export {QueryParser} from './util/QueryParser';
 
-// Dtos
+// Data Transfer Objects
 export {WeatherRecord} from './data/dtos/WeatherRecord';
 export {DeviceInfo} from './data/dtos/DeviceInfo';
 export {CurrentWeatherData} from './data/dtos/CurrentWeatherData';

@@ -11,15 +11,15 @@ export class DeviceService implements IDeviceService {
      * @inheritDoc
      */
     constructor(deviceRepository: IDeviceRepository) {
-        this.deviceRepository = deviceRepository;
+        this._deviceRepository = deviceRepository;
     }
 
     /**
      * @inheritDoc
      */
     async getById(id: string): Promise<Record<string, any> | null> {
-        return await this.deviceRepository.findById(id);
+        return await this._deviceRepository.findById(id);
     }
 
-    private deviceRepository: IDeviceRepository;
+    private readonly _deviceRepository: IDeviceRepository;
 }

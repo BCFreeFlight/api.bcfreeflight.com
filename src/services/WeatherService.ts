@@ -10,20 +10,19 @@ import {WeatherRecord} from "../data/dtos/WeatherRecord";
  * @inheritDoc
  */
 export class WeatherService {
-    private weatherRepository: IWeatherRepository;
 
     /**
      * @inheritDoc
      */
     constructor(weatherRepository: IWeatherRepository) {
-        this.weatherRepository = weatherRepository;
+        this._weatherRepository = weatherRepository;
     }
 
     /**
      * @inheritDoc
      */
     async processAverages(): Promise<void> {
-        await this.weatherRepository.processAverages();
+        await this._weatherRepository.processAverages();
     }
 
     /**
@@ -43,6 +42,8 @@ export class WeatherService {
             data,
         };
 
-        return await this.weatherRepository.saveWeatherData(payload);
+        return await this._weatherRepository.saveWeatherData(payload);
     }
+
+    private readonly _weatherRepository: IWeatherRepository;
 }

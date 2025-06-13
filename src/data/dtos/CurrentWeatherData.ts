@@ -4,6 +4,7 @@
  * This class provides properties to access various weather-related measurements such as temperature, pressure, humidity, wind speed, and rainfall.
  */
 export class CurrentWeatherData {
+
     /**
      * Creates an instance of a weather data object and initializes its properties.
      *

@@ -3,6 +3,7 @@
  * location, elevation, and timezone context.
  */
 export class DeviceInfo {
+
     /**
      * Creates a new instance of DeviceInfo.
      * @param id - Unique identifier for the device.

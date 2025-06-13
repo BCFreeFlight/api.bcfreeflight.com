@@ -15,12 +15,12 @@ export class AwsDynamoDBWeatherRepository implements IWeatherRepository {
      * @inheritDoc
      */
     constructor(dbClient: DynamoDBClient, tableName: string) {
-        this.client = DynamoDBDocumentClient.from(dbClient, {
+        this._client = DynamoDBDocumentClient.from(dbClient, {
             marshallOptions: {
                 removeUndefinedValues: true,
             },
         });
-        this.tableName = tableName;
+        this._tableName = tableName;
     }
 
     processAverages(): Promise<void> {
@@ -44,13 +44,13 @@ export class AwsDynamoDBWeatherRepository implements IWeatherRepository {
     }): Promise<WeatherRecord> {
         const payload = new WeatherRecord({id, device, timestamp, data});
         const putCommand = new PutItemCommand({
-            TableName: this.tableName,
+            TableName: this._tableName,
             Item: marshall(payload, {removeUndefinedValues: true})
         });
-        await this.client.send(putCommand);
+        await this._client.send(putCommand);
         return payload;
     }
 
-    private readonly client: DynamoDBDocumentClient;
-    private readonly tableName: string;
+    private readonly _client: DynamoDBDocumentClient;
+    private readonly _tableName: string;
 }

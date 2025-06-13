@@ -13,12 +13,12 @@ export class AwsDynamoDBDeviceRepository implements IDeviceRepository {
      * @inheritdoc
      */
     constructor(dbClient: DynamoDBClient, tableName: string) {
-        this.client = DynamoDBDocumentClient.from(dbClient, {
+        this._client = DynamoDBDocumentClient.from(dbClient, {
             marshallOptions: {
                 removeUndefinedValues: true,
             },
         });
-        this.tableName = tableName;
+        this._tableName = tableName;
     }
 
     /**
@@ -28,16 +28,16 @@ export class AwsDynamoDBDeviceRepository implements IDeviceRepository {
         if (!id) throw new Error("uploadKey is required");
 
         const getCommand = new GetItemCommand({
-            TableName: this.tableName,
+            TableName: this._tableName,
             Key: {
                 id: {S: id}
             }
         });
 
-        const result = await this.client.send(getCommand);
+        const result = await this._client.send(getCommand);
         return result.Item ? (unmarshall(result.Item) || null) : null;
     }
 
-    private readonly client: DynamoDBDocumentClient;
-    private readonly tableName: string;
+    private readonly _client: DynamoDBDocumentClient;
+    private readonly _tableName: string;
 }
