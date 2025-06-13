@@ -4,6 +4,8 @@ import {marshall} from "@aws-sdk/util-dynamodb";
 import {DynamoDBDocumentClient} from '@aws-sdk/lib-dynamodb';
 import {IWeatherRepository} from '../interfaces/IWeatherRepository';
 import { WeatherRecord } from "./dtos/WeatherRecord";
+import {DeviceInfo} from "./dtos/DeviceInfo";
+import {CurrentWeatherData} from "./dtos/CurrentWeatherData";
 
 /**
  * @inheritDoc
@@ -20,6 +22,10 @@ export class AwsDynamoDBWeatherRepository implements IWeatherRepository {
         });
         this.tableName = tableName;
     }
+
+    processAverages(): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
     /**
      * @inheritDoc
      */
@@ -32,11 +38,11 @@ export class AwsDynamoDBWeatherRepository implements IWeatherRepository {
      */
     async saveWeatherData({id, device, timestamp, data}: {
         id: string;
-        device: Record<string, any>;
+        device: DeviceInfo;
         timestamp: string;
-        data: Record<string, any>;
-    }): Promise<Record<string, any>> {
-        const payload = {id, device, timestamp, data};
+        data: CurrentWeatherData;
+    }): Promise<WeatherRecord> {
+        const payload = new WeatherRecord({id, device, timestamp, data});
         const putCommand = new PutItemCommand({
             TableName: this.tableName,
             Item: marshall(payload, {removeUndefinedValues: true})

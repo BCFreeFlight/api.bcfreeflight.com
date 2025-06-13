@@ -20,3 +20,8 @@ export {DeviceService} from './services/DeviceService';
 
 // Utilities
 export {QueryParser} from './util/QueryParser';
+
+// Dtos
+export {WeatherRecord} from './data/dtos/WeatherRecord';
+export {DeviceInfo} from './data/dtos/DeviceInfo';
+export {CurrentWeatherData} from './data/dtos/CurrentWeatherData';
