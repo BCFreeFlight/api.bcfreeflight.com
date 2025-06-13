@@ -15,9 +15,11 @@ async function extractInterfaceDocumentation(srcDir: string): Promise<Map<string
   const otherInterfaceFiles = await glob.glob(path.join(srcDir, '**', 'I*.ts'));
   // Also search for service interfaces that might not be in the interfaces directory
   const serviceInterfaceFiles = await glob.glob(path.join(srcDir, '**', '*Service.ts'));
+  // Search for repository interface implementations
+  const repositoryFiles = await glob.glob(path.join(srcDir, '**', '*Repository.ts'));
 
   // Process all interface files (both standard interfaces and service interfaces)
-  const allInterfaceFiles = [...interfaceFiles, ...otherInterfaceFiles, ...serviceInterfaceFiles];
+  const allInterfaceFiles = [...interfaceFiles, ...otherInterfaceFiles, ...serviceInterfaceFiles, ...repositoryFiles];
 
   for (const filePath of allInterfaceFiles) {
     const content = fs.readFileSync(filePath, 'utf8');
@@ -82,21 +84,21 @@ function processBundle(bundlePath: string, docMap: Map<string, string>): void {
   let bundleContent = fs.readFileSync(bundlePath, 'utf8');
 
   // Find all classes that implement interfaces
-  // Improved regex to handle any whitespace, including newlines
-  const implementsMatches = bundleContent.match(/class\s+(\w+)[\s\n]*implements[\s\n]*(I\w+)/g) || [];
   const classToInterface = new Map<string, string>();
 
-  for (const match of implementsMatches) {
-    const parts = match.match(/class\s+(\w+)[\s\n]*implements[\s\n]*(I\w+)/);
-    if (parts) {
-      classToInterface.set(parts[1], parts[2]);
-      console.log(`Mapped class ${parts[1]} to interface ${parts[2]}`);
-    }
+  // Use a more robust approach to find class implementations
+  const classRegex = /class\s+(\w+)(?:[\s\n]*extends[\s\n]*\w+)?[\s\n]*implements[\s\n]*(I\w+)/g;
+  let classMatch;
+  while ((classMatch = classRegex.exec(bundleContent)) !== null) {
+    const className = classMatch[1];
+    const interfaceName = classMatch[2];
+    classToInterface.set(className, interfaceName);
+    console.log(`Mapped class ${className} to interface ${interfaceName}`);
   }
 
   // Replace @inheritDoc comments
   bundleContent = bundleContent.replace(
-    /\/\*\*\s*\n\s*\*\s*@inherit[dD]oc\s*\n?\s*\*\/\s*(?:export\s+)?(?:class\s+(\w+)|constructor|(async\s+)?\w+\s*\()/gi,
+    /\/\*\*\s*\n\s*\*\s*@inherit[dD]oc\s*\n?\s*\*\/\s*(?:export\s+)?(?:class\s+(\w+)|constructor|(async\s+)?(\w+)\s*\()/gi,
     (match, className, asyncKeyword, offset) => {
       // Determine if this is a class, constructor, or method
       if (className) {
@@ -123,9 +125,23 @@ function processBundle(bundlePath: string, docMap: Map<string, string>): void {
         if (methodMatch) {
           const methodName = methodMatch[1];
           const beforeMatch = bundleContent.substring(0, offset);
-          const classMatch = beforeMatch.match(/class\s+(\w+)[\s\n]*implements[\s\n]*(I\w+)[^{]*{[^]*$/i);
-          if (classMatch) {
-            const [, className, interfaceName] = classMatch;
+
+          // Find the containing class more robustly - search backwards from the current position
+          let closestClassPos = -1;
+          let className = null;
+          let interfaceName = null;
+
+          // Find all class declarations and pick the closest one
+          const classMatches = [...beforeMatch.matchAll(/class\s+(\w+)(?:[\s\n]*extends[\s\n]*\w+)?[\s\n]*implements[\s\n]*(I\w+)/g)];
+          for (const classMatch of classMatches) {
+            if (classMatch.index && classMatch.index > closestClassPos) {
+              closestClassPos = classMatch.index;
+              className = classMatch[1];
+              interfaceName = classMatch[2];
+            }
+          }
+
+          if (className && interfaceName) {
             const docKey = `${interfaceName}.${methodName}`;
             if (docMap.has(docKey)) {
               console.log(`Replaced @inheritDoc for ${className}.${methodName} with documentation from ${interfaceName}.${methodName}`);
@@ -133,6 +149,8 @@ function processBundle(bundlePath: string, docMap: Map<string, string>): void {
             } else {
               console.warn(`Warning: Could not find documentation for ${docKey} in the documentation map`);
             }
+          } else {
+            console.warn(`Warning: Could not find containing class for method ${methodName}`);
           }
         }
       }
@@ -153,19 +171,67 @@ export async function processInheritDoc(bundlePath: string): Promise<void> {
 
   // Debug: Log how many @inheritDoc instances are in the bundle before processing
   const bundleContent = fs.readFileSync(bundlePath, 'utf8');
-  const inheritDocCount = (bundleContent.match(/@inherit[dD]oc/g) || []).length;
+  const inheritDocMatches = bundleContent.match(/@inherit[dD]oc/g) || [];
+  const inheritDocCount = inheritDocMatches.length;
   console.log(`Found ${inheritDocCount} @inheritDoc instances before processing`);
 
   // Log documentation map keys for debugging
   console.log(`Extracted documentation for ${docMap.size} symbols:`, Array.from(docMap.keys()));
 
+  // Find all the @inheritDoc locations to debug them
+  const inheritDocRegex = /\/\*\*\s*\n\s*\*\s*@inherit[dD]oc\s*\n?\s*\*\/\s*(?:export\s+)?(?:class\s+(\w+)|constructor|(async\s+)?(\w+)\s*\()/gi;
+  let match;
+  let matchCount = 0;
+  let regexResetContent = bundleContent;
+  console.log('Analyzing @inheritDoc instances:');
+  inheritDocRegex.lastIndex = 0;
+  while ((match = inheritDocRegex.exec(regexResetContent)) !== null) {
+    matchCount++;
+    const [fullMatch, className, asyncFlag, methodName] = match;
+    const contextStart = Math.max(0, match.index - 100);
+    const contextEnd = Math.min(regexResetContent.length, match.index + fullMatch.length + 100);
+    const context = regexResetContent.substring(contextStart, contextEnd);
+
+    if (className) {
+      console.log(`${matchCount}. Class @inheritDoc: ${className}`);
+    } else if (methodName) {
+      console.log(`${matchCount}. Method @inheritDoc: ${methodName}${asyncFlag ? ' (async)' : ''}`);
+    } else if (fullMatch.includes('constructor')) {
+      console.log(`${matchCount}. Constructor @inheritDoc`);
+    } else {
+      console.log(`${matchCount}. Unknown @inheritDoc type`);
+    }
+
+    console.log(`   Context: ${context.replace(/\n/g, '\n   ').substring(0, 200)}...`);
+  }
+
   processBundle(bundlePath, docMap);
 
   // Check if any @inheritDoc instances remain after processing
   const processedContent = fs.readFileSync(bundlePath, 'utf8');
-  const remainingCount = (processedContent.match(/@inherit[dD]oc/g) || []).length;
+  const remainingMatches = processedContent.match(/@inherit[dD]oc/g) || [];
+  const remainingCount = remainingMatches.length;
   if (remainingCount > 0) {
     console.warn(`⚠️ Warning: ${remainingCount} @inheritDoc instances remain in the processed bundle`);
+
+    // Show which @inheritDoc instances are still remaining
+    inheritDocRegex.lastIndex = 0;
+    regexResetContent = processedContent;
+    matchCount = 0;
+    console.log('Remaining @inheritDoc instances:');
+    while ((match = inheritDocRegex.exec(regexResetContent)) !== null) {
+      matchCount++;
+      const [fullMatch, className, asyncFlag, methodName] = match;
+      if (className) {
+        console.log(`${matchCount}. Remaining Class @inheritDoc: ${className}`);
+      } else if (methodName) {
+        console.log(`${matchCount}. Remaining Method @inheritDoc: ${methodName}${asyncFlag ? ' (async)' : ''}`);
+      } else if (fullMatch.includes('constructor')) {
+        console.log(`${matchCount}. Remaining Constructor @inheritDoc`);
+      } else {
+        console.log(`${matchCount}. Remaining Unknown @inheritDoc type`);
+      }
+    }
   } else {
     console.log(`✅ Successfully processed all @inheritDoc comments in bundle`);
   }
