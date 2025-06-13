@@ -3,6 +3,7 @@ import {PutItemCommand, DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {marshall} from "@aws-sdk/util-dynamodb";
 import {DynamoDBDocumentClient} from '@aws-sdk/lib-dynamodb';
 import {IWeatherRepository} from '../interfaces/IWeatherRepository';
+import { WeatherRecord } from "./dtos/WeatherRecord";
 
 /**
  * @inheritDoc
@@ -18,6 +19,12 @@ export class AwsDynamoDBWeatherRepository implements IWeatherRepository {
             },
         });
         this.tableName = tableName;
+    }
+    /**
+     * @inheritDoc
+     */
+    listAllCurrent(): Promise<WeatherRecord[]> {
+        throw new Error("Method not implemented.");
     }
 
     /**

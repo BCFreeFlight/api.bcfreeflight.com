@@ -1,3 +1,7 @@
+import {WeatherRecord} from "../data/dtos/WeatherRecord";
+import {CurrentWeatherData} from "../data/dtos/CurrentWeatherData";
+import {DeviceInfo} from "../data/dtos/DeviceInfo";
+
 /**
  * Interface representing a repository for managing weather data.
  */
@@ -7,15 +11,30 @@ export interface IWeatherRepository {
      *
      * @param {Object} params - The parameters for the weather data to be saved.
      * @param {string} params.id - The unique identifier for the weather data entry.
-     * @param {Object} params.device - Details of the device that collected the weather data.
+     * @param {DeviceInfo} params.device - Details of the device that collected the weather data.
      * @param {string} params.timestamp - The timestamp when the data was collected.
-     * @param {Object} params.data - The actual weather data readings.
-     * @return {Promise<Object>} A promise that resolves to a confirmation object containing details of the saved data.
+     * @param {CurrentWeatherData} params.data - The actual weather data readings.
+     * @return {Promise<WeatherRecord>} A promise that resolves to a confirmation object containing details of the saved data.
      */
     saveWeatherData(params: {
         id: string;
-        device: Record<string, any>;
+        device: DeviceInfo;
         timestamp: string;
-        data: Record<string, any>;
-    }): Promise<Record<string, any>>;
+        data: CurrentWeatherData;
+    }): Promise<WeatherRecord>;
+
+    /**
+     * Retrieves a list of all current weather records from the database or external source.
+     *
+     * @return {Promise<WeatherRecord[]>} A promise that resolves to an array of WeatherRecord objects representing all values in the Current Weather table.
+     */
+    listAllCurrent(): Promise<WeatherRecord[]>;
+
+    /**
+     * Processes and computes averages based on a predefined dataset or input.
+     * Performs necessary calculations asynchronously.
+     *
+     * @return {Promise<void>} A promise that resolves when the processing is complete.
+     */
+    processAverages(): Promise<void>;
 }

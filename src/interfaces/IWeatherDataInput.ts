@@ -1,3 +1,6 @@
+import {DeviceInfo} from "../data/dtos/DeviceInfo";
+import {CurrentWeatherData} from "../data/dtos/CurrentWeatherData";
+
 /**
  * Interface representing a weather data input object.
  *
@@ -5,7 +8,7 @@
  */
 export interface IWeatherDataInput {
     id: string;
-    device: Record<string, any>;
+    device: DeviceInfo;
     timestamp: string;
-    data: Record<string, any>;
+    data: CurrentWeatherData;
 }
