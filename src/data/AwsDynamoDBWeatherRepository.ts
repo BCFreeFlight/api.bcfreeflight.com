@@ -1,9 +1,9 @@
 // DynamoDBWeatherRepository.ts
-import {PutItemCommand, DynamoDBClient} from "@aws-sdk/client-dynamodb";
-import {marshall} from "@aws-sdk/util-dynamodb";
+import {PutItemCommand, DynamoDBClient, ScanCommand} from "@aws-sdk/client-dynamodb";
+import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
 import {DynamoDBDocumentClient} from '@aws-sdk/lib-dynamodb';
 import {IWeatherRepository} from '../interfaces/IWeatherRepository';
-import { WeatherRecord } from "./dtos/WeatherRecord";
+import {WeatherRecord} from "./dtos/WeatherRecord";
 import {DeviceInfo} from "./dtos/DeviceInfo";
 import {CurrentWeatherData} from "./dtos/CurrentWeatherData";
 
@@ -23,13 +23,17 @@ export class AwsDynamoDBWeatherRepository implements IWeatherRepository {
         this._tableName = tableName;
     }
 
-    processAverages(): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
     /**
      * @inheritDoc
      */
-    listAllCurrent(): Promise<WeatherRecord[]> {
+    async processAverages(): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+
+    /**
+     * @inheritDoc
+     */
+    async listAllCurrent(): Promise<WeatherRecord[]> {
         throw new Error("Method not implemented.");
     }
 

@@ -9,12 +9,15 @@ import * as glob from 'glob';
  */
 async function extractInterfaceDocumentation(srcDir: string): Promise<Map<string, string>> {
   const docMap = new Map<string, string>();
+  // Expanded search to find all interface files
   const interfaceFiles = await glob.glob(path.join(srcDir, '**', 'interfaces', '*.ts'));
+  // Also search for interface files that might be in other directories
+  const otherInterfaceFiles = await glob.glob(path.join(srcDir, '**', 'I*.ts'));
   // Also search for service interfaces that might not be in the interfaces directory
   const serviceInterfaceFiles = await glob.glob(path.join(srcDir, '**', '*Service.ts'));
 
   // Process all interface files (both standard interfaces and service interfaces)
-  const allInterfaceFiles = [...interfaceFiles, ...serviceInterfaceFiles];
+  const allInterfaceFiles = [...interfaceFiles, ...otherInterfaceFiles, ...serviceInterfaceFiles];
 
   for (const filePath of allInterfaceFiles) {
     const content = fs.readFileSync(filePath, 'utf8');
@@ -79,20 +82,22 @@ function processBundle(bundlePath: string, docMap: Map<string, string>): void {
   let bundleContent = fs.readFileSync(bundlePath, 'utf8');
 
   // Find all classes that implement interfaces
-  const implementsMatches = bundleContent.match(/class\s+(\w+)\s+implements\s+(\w+)/g) || [];
+  // Improved regex to handle any whitespace, including newlines
+  const implementsMatches = bundleContent.match(/class\s+(\w+)[\s\n]*implements[\s\n]*(I\w+)/g) || [];
   const classToInterface = new Map<string, string>();
 
   for (const match of implementsMatches) {
-    const parts = match.match(/class\s+(\w+)\s+implements\s+(\w+)/);
+    const parts = match.match(/class\s+(\w+)[\s\n]*implements[\s\n]*(I\w+)/);
     if (parts) {
       classToInterface.set(parts[1], parts[2]);
+      console.log(`Mapped class ${parts[1]} to interface ${parts[2]}`);
     }
   }
 
   // Replace @inheritDoc comments
   bundleContent = bundleContent.replace(
-    /\/\*\*\s*\n\s*\*\s*@inherit[dD]oc\s*\n?\s*\*\/\s*(?:export\s+)?(?:class\s+(\w+)|constructor|\w+\s*\()/gi,
-    (match, className, offset) => {
+    /\/\*\*\s*\n\s*\*\s*@inherit[dD]oc\s*\n?\s*\*\/\s*(?:export\s+)?(?:class\s+(\w+)|constructor|(async\s+)?\w+\s*\()/gi,
+    (match, className, asyncKeyword, offset) => {
       // Determine if this is a class, constructor, or method
       if (className) {
         // This is a class doc
@@ -114,16 +119,19 @@ function processBundle(bundlePath: string, docMap: Map<string, string>): void {
       } else {
         // This is a method doc
         // Extract method name and find the containing class
-        const methodMatch = match.match(/\/\*\*[\s\S]*?\*\/\s*(\w+)\s*\(/);
+        const methodMatch = match.match(/\/\*\*[\s\S]*?\*\/\s*(?:async\s+)?(\w+)\s*\(/);
         if (methodMatch) {
           const methodName = methodMatch[1];
           const beforeMatch = bundleContent.substring(0, offset);
-          const classMatch = beforeMatch.match(/class\s+(\w+)\s+implements\s+(\w+)[^{]*{[^]*$/i);
+          const classMatch = beforeMatch.match(/class\s+(\w+)[\s\n]*implements[\s\n]*(I\w+)[^{]*{[^]*$/i);
           if (classMatch) {
             const [, className, interfaceName] = classMatch;
             const docKey = `${interfaceName}.${methodName}`;
             if (docMap.has(docKey)) {
+              console.log(`Replaced @inheritDoc for ${className}.${methodName} with documentation from ${interfaceName}.${methodName}`);
               return docMap.get(docKey) + ` ${methodName}(`;
+            } else {
+              console.warn(`Warning: Could not find documentation for ${docKey} in the documentation map`);
             }
           }
         }
