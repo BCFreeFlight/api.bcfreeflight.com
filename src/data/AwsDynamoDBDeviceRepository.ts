@@ -2,15 +2,18 @@
 import {GetItemCommand, DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {unmarshall} from "@aws-sdk/util-dynamodb";
 import {DynamoDBDocumentClient} from '@aws-sdk/lib-dynamodb';
-import {IDeviceRepository} from '../interfaces/IDeviceRepository';
 
 /**
- * @inheritDoc
+ * A repository for interacting with a table containing device data.
+ * This repository provides a method to get devices by their id.
  */
-export class AwsDynamoDBDeviceRepository implements IDeviceRepository {
+export class AwsDynamoDBDeviceRepository {
 
     /**
-     * @inheritDoc
+     * Creates a new instance of AwsDynamoDBDeviceRepository.
+     * 
+     * @param {DynamoDBClient} dbClient - The DynamoDB client to use for database operations.
+     * @param {string} tableName - The name of the DynamoDB table containing device data.
      */
     constructor(dbClient: DynamoDBClient, tableName: string) {
         this._client = DynamoDBDocumentClient.from(dbClient, {
@@ -22,7 +25,12 @@ export class AwsDynamoDBDeviceRepository implements IDeviceRepository {
     }
 
     /**
-     * @inheritDoc
+     * Finds and retrieves the record associated with the provided id from the table.
+     * The uploadKey parameter is now treated as the table's id column.
+     *
+     * @param {string} id - The id of the record to retrieve (previously this was the upload key).
+     * @return {Promise<Record<string, any>|null>} A promise that resolves to the retrieved item or null if not found.
+     * @throws {Error} Throws an error if the uploadKey (id) is not provided.
      */
     async findById(id: string): Promise<Record<string, any> | null> {
         if (!id) throw new Error("uploadKey is required");
