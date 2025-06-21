@@ -40,7 +40,7 @@ export class WeatherService {
     async saveWeatherData(
         device: DeviceInfo,
         data: CurrentWeatherData
-    ): Promise<WeatherRecord> {
+    ): Promise<string> {
         const timestamp = new Date().toISOString();
         const id = nanoid();
 
