@@ -3,6 +3,7 @@ import nodeExternalsPlugin from 'esbuild-plugin-node-externals';
 import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
+
 // Setup paths
 const distDir = path.resolve('dist');
 const artifactsDir = path.resolve('artifacts');
@@ -20,11 +21,11 @@ fs.mkdirSync(nestedDir, { recursive: true });
 // Run esbuild
 await build({
     entryPoints: ['src/index.ts'],
-    outfile: path.join(nestedDir, 'bundle.js'),
+    outfile: path.join(nestedDir, 'index.mjs'),
     bundle: true,
     platform: 'node',
     format: 'esm',
-    target: 'node18', // Adjust for your runtime
+    target: 'node18',
     sourcemap: false,
     external: [
         '@aws-sdk/client-dynamodb',
@@ -36,37 +37,33 @@ await build({
     keepNames: true,
     minify: false,
     legalComments: 'inline',
+    // Add these options to ensure proper ESM export handling
+    splitting: false,
+    treeShaking: true
 });
+
+// Create package.json for the bcfreeflight package
+const packageJsonContent = {
+    name: 'bcfreeflight',
+    version: '1.0.0',
+    type: 'module',
+    main: 'index.mjs',
+    exports: {
+        '.': {
+            'import': './index.mjs',
+            'default': './index.mjs'
+        }
+    }
+};
+
+fs.writeFileSync(
+    path.join(nestedDir, 'package.json'),
+    JSON.stringify(packageJsonContent, null, 2)
+);
+
+console.log(`✅ Created package.json for bcfreeflight module`);
 
 // Zip the result
 execSync(`cd ${distDir} && zip -r ${zipFile} .`, { stdio: 'inherit' });
 
 console.log(`✅ Build complete. Zip created at: ${zipFile}`);
-
-// --- Symlink creation for bcfreeflight.js ---
-const symlinkTarget = path.join(nestedDir, 'bundle.js');
-const symlinkLocation = path.join('node_modules', 'bcfreeflight.js');
-
-// Remove existing symlink or file
-if (fs.existsSync(symlinkLocation)) {
-    try {
-        const stat = fs.lstatSync(symlinkLocation);
-        if (stat.isSymbolicLink() || stat.isFile()) {
-            fs.unlinkSync(symlinkLocation);
-        } else {
-            throw new Error(`${symlinkLocation} exists and is not a file or symlink.`);
-        }
-    } catch (err) {
-        console.error(`Failed to remove existing ${symlinkLocation}:`, err);
-        process.exit(1);
-    }
-}
-
-// Create new symlink
-try {
-    fs.symlinkSync(path.relative(path.dirname(symlinkLocation), symlinkTarget), symlinkLocation);
-    console.log(`✅ Symlink created: ${symlinkLocation} -> ${symlinkTarget}`);
-} catch (err) {
-    console.error(`Failed to create symlink ${symlinkLocation} -> ${symlinkTarget}:`, err);
-    process.exit(1);
-}

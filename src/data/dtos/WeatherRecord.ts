@@ -20,35 +20,21 @@ export class WeatherRecord {
         data: CurrentWeatherData;
         device: DeviceInfo;
     }) {
-        this._id = params.id;
-        this._timestamp = params.timestamp;
-        this._data = params.data;
-        this._device = params.device;
+        this.id = params.id;
+        this.timestamp = params.timestamp;
+        this.data = params.data;
+        this.device = params.device;
     }
 
     /** Unique identifier for this weather record. */
-    public get id(): string {
-        return this._id;
-    }
+    public readonly id: string;
 
     /** Timestamp of when this weather record was created (in ISO 8601 format). */
-    public get timestamp(): string {
-        return this._timestamp;
-    }
+    public readonly timestamp: string;
 
     /** Aggregated or processed weather data collected at the time of this record. */
-    public get data(): CurrentWeatherData {
-        return this._data;
-    }
+    public readonly data: CurrentWeatherData;
 
     /** Metadata about the device that generated this weather record. */
-    public get device(): DeviceInfo {
-        return this._device;
-    }
-
-    // Private fields (defined at bottom per preferred style)
-    private readonly _id: string;
-    private readonly _timestamp: string;
-    private readonly _data: CurrentWeatherData;
-    private readonly _device: DeviceInfo;
+    public readonly device: DeviceInfo;
 }

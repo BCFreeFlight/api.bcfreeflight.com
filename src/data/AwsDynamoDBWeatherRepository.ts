@@ -51,7 +51,7 @@ export class AwsDynamoDBWeatherRepository {
     async saveWeatherData(input: WeatherDataInput): Promise<string> {
         const putCommand = new PutItemCommand({
             TableName: this._tableName,
-            Item: marshall(input, {removeUndefinedValues: true})
+            Item: marshall(input, {removeUndefinedValues: true, convertClassInstanceToMap: true})
         });
         await this._client.send(putCommand);
         return input.id;
