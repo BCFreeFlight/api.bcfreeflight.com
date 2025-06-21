@@ -11,13 +11,13 @@ export class WeatherDataInput {
      * Creates a new instance of WeatherDataInput.
      * 
      * @param {string} id - The unique identifier for the weather data entry.
-     * @param {DevicePreview} devicePreview - Details of the device that collected the weather data.
+     * @param {DevicePreview} device - Details of the device that collected the weather data.
      * @param {string} timestamp - The timestamp when the data was collected.
      * @param {CurrentWeatherData} data - The actual weather data readings.
      */
     constructor(
         public readonly id: string,
-        public readonly devicePreview: DevicePreview,
+        public readonly device: DevicePreview,
         public readonly timestamp: string,
         public readonly data: CurrentWeatherData
     ) {}
