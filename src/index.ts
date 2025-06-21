@@ -18,8 +18,10 @@ export {QueryParser} from './util/QueryParser';
 export {WeatherRecord} from './data/dtos/WeatherRecord';
 export {DeviceInfo} from './data/dtos/DeviceInfo';
 export {CurrentWeatherData} from './data/dtos/CurrentWeatherData';
-export {WeatherDataInput} from './data/dtos/WeatherDataInput';
 export {DevicePreview} from './data/dtos/DevicePreview';
+export {Range} from './data/dtos/Range';
+export {AverageWeatherData} from './data/dtos/AverageWeatherData';
+
 
 // Import all exports to create a default export
 import {AwsLambdaResponseFactory} from './http/AwsLambdaResponseFactory';
@@ -29,11 +31,12 @@ import {AwsDynamoDBWeatherRepository} from './data/AwsDynamoDBWeatherRepository'
 import {WeatherService} from './services/WeatherService';
 import {DeviceService} from './services/DeviceService';
 import {QueryParser} from './util/QueryParser';
-import {WeatherRecord} from './data/dtos/WeatherRecord';
 import {DeviceInfo} from './data/dtos/DeviceInfo';
 import {CurrentWeatherData} from './data/dtos/CurrentWeatherData';
-import {WeatherDataInput} from './data/dtos/WeatherDataInput';
+import {WeatherRecord} from './data/dtos/WeatherRecord';
 import {DevicePreview} from './data/dtos/DevicePreview';
+import {Range} from "./data/dtos/Range";
+import {AverageWeatherData} from "./data/dtos/AverageWeatherData";
 
 // Export everything as default as well
 const bcfreeflight = {
@@ -47,7 +50,8 @@ const bcfreeflight = {
     WeatherRecord,
     DeviceInfo,
     CurrentWeatherData,
-    WeatherDataInput,
+    AverageWeatherData,
+    Range,
     DevicePreview
 };
 

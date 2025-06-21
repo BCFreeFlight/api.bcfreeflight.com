@@ -1,40 +1,24 @@
-import { CurrentWeatherData } from "./CurrentWeatherData";
-import { DeviceInfo } from "./DeviceInfo";
+import {CurrentWeatherData} from "./CurrentWeatherData";
+import {DevicePreview} from "./DevicePreview";
 
 /**
- * Represents a single summarized weather record that combines processed
- * weather data with metadata about the reporting device.
+ * Class representing a weather data input object.
+ *
+ * This class is designed to structure the data received from weather stations or devices.
  */
 export class WeatherRecord {
     /**
-     * Constructs a new WeatherRecord instance.
-     * @param params - An object containing all required properties.
-     * @param params.id - Unique identifier for the weather record.
-     * @param params.timestamp - ISO timestamp representing when the record was created.
-     * @param params.data - Processed weather data (averaged or summarized).
-     * @param params.device - Metadata about the device that submitted the data.
+     * Creates a new instance of WeatherDataInput.
+     * 
+     * @param {string} id - The unique identifier for the weather data entry.
+     * @param {DevicePreview} device - Details of the device that collected the weather data.
+     * @param {string} timestamp - The timestamp when the data was collected.
+     * @param {CurrentWeatherData} data - The actual weather data readings.
      */
-    constructor(params: {
-        id: string;
-        timestamp: string;
-        data: CurrentWeatherData;
-        device: DeviceInfo;
-    }) {
-        this.id = params.id;
-        this.timestamp = params.timestamp;
-        this.data = params.data;
-        this.device = params.device;
-    }
-
-    /** Unique identifier for this weather record. */
-    public readonly id: string;
-
-    /** Timestamp of when this weather record was created (in ISO 8601 format). */
-    public readonly timestamp: string;
-
-    /** Aggregated or processed weather data collected at the time of this record. */
-    public readonly data: CurrentWeatherData;
-
-    /** Metadata about the device that generated this weather record. */
-    public readonly device: DeviceInfo;
+    constructor(
+        public readonly id: string,
+        public readonly device: DevicePreview,
+        public readonly timestamp: string,
+        public readonly data: CurrentWeatherData
+    ) {}
 }

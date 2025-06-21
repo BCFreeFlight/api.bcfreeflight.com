@@ -3,7 +3,6 @@ import {PutItemCommand, DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {marshall} from "@aws-sdk/util-dynamodb";
 import {DynamoDBDocumentClient} from '@aws-sdk/lib-dynamodb';
 import {WeatherRecord} from "./dtos/WeatherRecord";
-import {WeatherDataInput} from "./dtos/WeatherDataInput";
 
 /**
  * Repository for managing weather data.
@@ -48,7 +47,7 @@ export class AwsDynamoDBWeatherRepository {
      *
      * @return {Promise<WeatherRecord>} A promise that resolves to a confirmation object containing details of the saved data.
      */
-    async saveWeatherData(input: WeatherDataInput): Promise<string> {
+    async saveWeatherData(input: WeatherRecord): Promise<string> {
         const putCommand = new PutItemCommand({
             TableName: this._tableName,
             Item: marshall(input, {removeUndefinedValues: true, convertClassInstanceToMap: true})

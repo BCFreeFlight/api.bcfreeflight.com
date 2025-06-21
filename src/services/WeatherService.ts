@@ -2,7 +2,7 @@
 import {nanoid} from "nanoid";
 import {DeviceInfo} from "../data/dtos/DeviceInfo";
 import {CurrentWeatherData} from "../data/dtos/CurrentWeatherData";
-import {WeatherDataInput} from "../data/dtos/WeatherDataInput";
+import {WeatherRecord} from "../data/dtos/WeatherRecord";
 import {AwsDynamoDBWeatherRepository} from "../data/AwsDynamoDBWeatherRepository";
 
 /**
@@ -43,7 +43,7 @@ export class WeatherService {
         const timestamp = new Date().toISOString();
         const id = nanoid();
         const devicePreview = device.toPreview();
-        const payload = new WeatherDataInput(
+        const payload = new WeatherRecord(
             id,
             devicePreview,
             timestamp,

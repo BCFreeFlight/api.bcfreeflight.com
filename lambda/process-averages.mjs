@@ -16,6 +16,7 @@ const weatherService = new WeatherService(weatherRepository);
 const deviceService = new DeviceService(deviceRepository);
 
 const handler = async (event) => {
+
 };
 
 export {handler};
