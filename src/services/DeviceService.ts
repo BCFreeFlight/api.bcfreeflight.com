@@ -1,5 +1,6 @@
 // DeviceService.ts
 import {AwsDynamoDBDeviceRepository} from '../data/AwsDynamoDBDeviceRepository';
+import {DeviceInfo} from "../data/dtos/DeviceInfo";
 
 /**
  * Service for device-related operations.
@@ -21,7 +22,7 @@ export class DeviceService {
      * @param {string} id - The unique identifier of the entity to retrieve.
      * @return {Promise<Record<string, any>|null>} A promise that resolves to the entity object if found, or null if not found.
      */
-    async getById(id: string): Promise<Record<string, any> | null> {
+    async getById(id: string): Promise<DeviceInfo | null> {
         return await this._deviceRepository.findById(id);
     }
 

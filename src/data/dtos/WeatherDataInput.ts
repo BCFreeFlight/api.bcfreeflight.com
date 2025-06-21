@@ -1,4 +1,3 @@
-import {DeviceInfo} from "./DeviceInfo";
 import {CurrentWeatherData} from "./CurrentWeatherData";
 
 /**
@@ -11,13 +10,13 @@ export class WeatherDataInput {
      * Creates a new instance of WeatherDataInput.
      * 
      * @param {string} id - The unique identifier for the weather data entry.
-     * @param {DeviceInfo} device - Details of the device that collected the weather data.
+     * @param {string} deviceId - Details of the device that collected the weather data.
      * @param {string} timestamp - The timestamp when the data was collected.
      * @param {CurrentWeatherData} data - The actual weather data readings.
      */
     constructor(
         public readonly id: string,
-        public readonly device: DeviceInfo,
+        public readonly deviceId: string,
         public readonly timestamp: string,
         public readonly data: CurrentWeatherData
     ) {}

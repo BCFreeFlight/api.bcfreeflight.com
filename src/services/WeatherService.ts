@@ -46,7 +46,7 @@ export class WeatherService {
 
         const payload = new WeatherDataInput(
             id,
-            device,
+            device.id,
             timestamp,
             data
         );

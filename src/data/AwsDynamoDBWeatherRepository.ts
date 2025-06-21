@@ -1,10 +1,9 @@
 // DynamoDBWeatherRepository.ts
-import {PutItemCommand, DynamoDBClient, ScanCommand} from "@aws-sdk/client-dynamodb";
-import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
+import {PutItemCommand, DynamoDBClient} from "@aws-sdk/client-dynamodb";
+import {marshall} from "@aws-sdk/util-dynamodb";
 import {DynamoDBDocumentClient} from '@aws-sdk/lib-dynamodb';
 import {WeatherRecord} from "./dtos/WeatherRecord";
-import {DeviceInfo} from "./dtos/DeviceInfo";
-import {CurrentWeatherData} from "./dtos/CurrentWeatherData";
+import {WeatherDataInput} from "./dtos/WeatherDataInput";
 
 /**
  * Repository for managing weather data.
@@ -12,7 +11,7 @@ import {CurrentWeatherData} from "./dtos/CurrentWeatherData";
 export class AwsDynamoDBWeatherRepository {
     /**
      * Creates a new instance of AwsDynamoDBWeatherRepository.
-     * 
+     *
      * @param {DynamoDBClient} dbClient - The DynamoDB client to use for database operations.
      * @param {string} tableName - The name of the DynamoDB table containing weather data.
      */
@@ -47,26 +46,15 @@ export class AwsDynamoDBWeatherRepository {
     /**
      * Saves weather data to the database or designated storage system.
      *
-     * @param {Object} params - The parameters for the weather data to be saved.
-     * @param {string} params.id - The unique identifier for the weather data entry.
-     * @param {DeviceInfo} params.device - Details of the device that collected the weather data.
-     * @param {string} params.timestamp - The timestamp when the data was collected.
-     * @param {CurrentWeatherData} params.data - The actual weather data readings.
      * @return {Promise<WeatherRecord>} A promise that resolves to a confirmation object containing details of the saved data.
      */
-    async saveWeatherData({id, device, timestamp, data}: {
-        id: string;
-        device: DeviceInfo;
-        timestamp: string;
-        data: CurrentWeatherData;
-    }): Promise<WeatherRecord> {
-        const payload = new WeatherRecord({id, device, timestamp, data});
+    async saveWeatherData(input: WeatherDataInput): Promise<string> {
         const putCommand = new PutItemCommand({
             TableName: this._tableName,
-            Item: marshall(payload, {removeUndefinedValues: true})
+            Item: marshall(input, {removeUndefinedValues: true})
         });
         await this._client.send(putCommand);
-        return payload;
+        return input.id;
     }
 
     private readonly _client: DynamoDBDocumentClient;
