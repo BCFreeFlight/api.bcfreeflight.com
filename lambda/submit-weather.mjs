@@ -4,14 +4,15 @@ import {AwsLambdaResponseFactory, QueryParser, AwsDynamoDBDeviceRepository, AwsD
 
 // Table names
 const deviceTable = "BCFF_Devices";
-const weatherTable = "BCFF_LiveWeather";
+const liveWeather = "BCFF_LiveWeather";
+const weather = "BCFF_Weather";
 
 // Create dependencies
 const dbClient = new DynamoDBClient({region: process.env.AWS_REGION});
 const responseFactory = new AwsLambdaResponseFactory();
 const queryParser = new QueryParser();
 const deviceRepository = new AwsDynamoDBDeviceRepository(dbClient, deviceTable);
-const weatherRepository = new AwsDynamoDBWeatherRepository(dbClient, weatherTable);
+const weatherRepository = new AwsDynamoDBWeatherRepository(dbClient, liveWeather, weather);
 const weatherService = new WeatherService(weatherRepository);
 const deviceService = new DeviceService(deviceRepository);
 
@@ -44,7 +45,7 @@ const handler = async (event) => {
             ? queryParser.parseBase64(event.body)
             : queryParser.parse(event.queryStringParameters);
 
-        await weatherService.saveWeatherData(device, payload);
+        await weatherService.SaveCurrent(device, payload);
         return responseFactory.createApiResponse(200, "Success");
     } catch (err) {
         console.error(err);

@@ -1,24 +1,26 @@
 import {CurrentWeatherData} from "./CurrentWeatherData";
-import {DevicePreview} from "./DevicePreview";
+import {AverageWeatherData} from "./AverageWeatherData";
+import {DeviceInfo} from "./DeviceInfo";
 
 /**
- * Class representing a weather data input object.
- *
- * This class is designed to structure the data received from weather stations or devices.
+ * Represents a single summarized weather record that combines processed
+ * weather data with metadata about the reporting device.
  */
-export class WeatherRecord {
+export class WeatherRecord<TWeatherData extends CurrentWeatherData | AverageWeatherData> {
+
     /**
-     * Creates a new instance of WeatherDataInput.
-     * 
-     * @param {string} id - The unique identifier for the weather data entry.
-     * @param {DevicePreview} device - Details of the device that collected the weather data.
-     * @param {string} timestamp - The timestamp when the data was collected.
-     * @param {CurrentWeatherData} data - The actual weather data readings.
+     * Constructor for creating an instance of the WeatherDataRecord class.
+     *
+     * @param {string} id - The unique identifier for the record.
+     * @param {string} timestamp - The timestamp when the record was created.
+     * @param {CurrentWeatherData | AverageWeatherData} data - The weather data associated with the record.
+     * @param {DeviceInfo} device - The device information from which the record was collected.
      */
     constructor(
         public readonly id: string,
-        public readonly device: DevicePreview,
         public readonly timestamp: string,
-        public readonly data: CurrentWeatherData
-    ) {}
+        public readonly data: TWeatherData,
+        public readonly device: DeviceInfo
+    ) {
+    }
 }

@@ -15,7 +15,7 @@ export {DeviceService} from './services/DeviceService';
 export {QueryParser} from './util/QueryParser';
 
 // Data Transfer Objects
-export {WeatherRecord} from './data/dtos/WeatherRecord';
+export {CurrentWeatherRecord} from './data/dtos/CurrentWeatherRecord';
 export {DeviceInfo} from './data/dtos/DeviceInfo';
 export {CurrentWeatherData} from './data/dtos/CurrentWeatherData';
 export {DevicePreview} from './data/dtos/DevicePreview';
@@ -33,7 +33,7 @@ import {DeviceService} from './services/DeviceService';
 import {QueryParser} from './util/QueryParser';
 import {DeviceInfo} from './data/dtos/DeviceInfo';
 import {CurrentWeatherData} from './data/dtos/CurrentWeatherData';
-import {WeatherRecord} from './data/dtos/WeatherRecord';
+import {CurrentWeatherRecord} from './data/dtos/CurrentWeatherRecord';
 import {DevicePreview} from './data/dtos/DevicePreview';
 import {Range} from "./data/dtos/Range";
 import {AverageWeatherData} from "./data/dtos/AverageWeatherData";
@@ -47,7 +47,7 @@ const bcfreeflight = {
     WeatherService,
     DeviceService,
     QueryParser,
-    WeatherRecord,
+    WeatherRecord: CurrentWeatherRecord,
     DeviceInfo,
     CurrentWeatherData,
     AverageWeatherData,
