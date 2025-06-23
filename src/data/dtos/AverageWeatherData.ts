@@ -15,7 +15,6 @@ export class AverageWeatherData {
      * @param {Range} baromabsin - Absolute atmospheric pressure in inches.
      * @param {Range} baromrelin - Relative atmospheric pressure in inches.
      * @param {Range} dailyrainin - Daily rainfall amount in inches.
-     * @param {string} dateutc - UTC date and time in string format.
      * @param {Range} eventrainin - Rainfall amount for a specific event in inches.
      * @param {string} freq - Frequency of data reporting.
      * @param {Range} heap - System heap memory usage.
@@ -49,7 +48,6 @@ export class AverageWeatherData {
         public readonly baromabsin: Range,
         public readonly baromrelin: Range,
         public readonly dailyrainin: Range,
-        public readonly dateutc: string,
         public readonly eventrainin: Range,
         public readonly freq: string,
         public readonly heap: Range,
@@ -62,7 +60,7 @@ export class AverageWeatherData {
         public readonly monthlyrainin: Range,
         public readonly PASSKEY: string,
         public readonly rainratein: Range,
-        public readonly runtime: Range,
+        public readonly runtime: number,
         public readonly solarradiation: Range,
         public readonly stationtype: string,
         public readonly tempf: Range,
@@ -94,6 +92,7 @@ export class AverageWeatherData {
 
         // Use the first item for string values
         const firstItem = weatherDataArray[0];
+        const lastItem = weatherDataArray[weatherDataArray.length - 1];
 
         // Create a date time range from the timestamps in the data array
         const dateTimeRange = ReadOnlyDateTimeRange.Create(weatherDataArray.map(data => data.dateutc));
@@ -102,7 +101,6 @@ export class AverageWeatherData {
             Range.create(weatherDataArray.map(data => data.baromabsin)),
             Range.create(weatherDataArray.map(data => data.baromrelin)),
             Range.create(weatherDataArray.map(data => data.dailyrainin)),
-            firstItem.dateutc,
             Range.create(weatherDataArray.map(data => data.eventrainin)),
             firstItem.freq,
             Range.create(weatherDataArray.map(data => data.heap)),
@@ -115,7 +113,7 @@ export class AverageWeatherData {
             Range.create(weatherDataArray.map(data => data.monthlyrainin)),
             firstItem.PASSKEY,
             Range.create(weatherDataArray.map(data => data.rainratein)),
-            Range.create(weatherDataArray.map(data => data.runtime)),
+            lastItem.runtime,
             Range.create(weatherDataArray.map(data => data.solarradiation)),
             firstItem.stationtype,
             Range.create(weatherDataArray.map(data => data.tempf)),
