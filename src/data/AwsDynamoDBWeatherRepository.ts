@@ -88,12 +88,16 @@ export class AwsDynamoDBWeatherRepository {
             return;
         }
 
+        console.log(`Deleting ${ids.length} items from ${this._currentWeatherTable}`);
+
         // Delete items in batches (DynamoDB batch write limit is 25 items)
         const batchSize = 25;
 
         for (let i = 0; i < ids.length; i += batchSize) {
             const batch = ids.slice(i, i + batchSize);
 
+            console.log(`Deleting ${batch.length} items`);
+            console.log(batch);
             const deleteRequests = batch.map(id => ({
                 DeleteRequest: {
                     Key: marshall({id})

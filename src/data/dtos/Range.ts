@@ -11,7 +11,7 @@ export class Range {
      */
     constructor(public readonly min: number,
                 public readonly max: number,
-                public readonly avg: number) {
+                public readonly avg: number | null) {
     }
 
     /**
@@ -21,8 +21,22 @@ export class Range {
      * @return {Range} A Range object containing the calculated minimum, maximum, and average values.
      */
     static create(numbers: number[]): Range {
-        return new Range(Math.min(...numbers),
-            Math.max(...numbers),
-            numbers.reduce((a, b) => a + b, 0) / numbers.length);
+        const validValues = numbers.filter(v =>
+            v !== null &&
+            v !== undefined &&
+            !Number.isNaN(v) &&
+            Number.isFinite(v)
+        );
+
+        if (validValues.length === 0) {
+            return new Range(0, 0, null); // or throw an error
+        }
+
+        const min = Math.min(...validValues);
+        const max = Math.max(...validValues);
+        const sum = validValues.reduce((acc, val) => acc + val, 0);
+        const avg = sum / validValues.length;
+
+        return new Range(min, max, avg);
     }
 }
