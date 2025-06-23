@@ -28,8 +28,6 @@ const deviceService = new DeviceService(deviceRepository);
  */
 const handler = async (event) => {
 
-    console.log(event.isBase64Encoded);
-    console.log(event.body);
     const uploadKey = queryParser.getParam(event.queryStringParameters, "uploadKey");
 
     if (!uploadKey) {

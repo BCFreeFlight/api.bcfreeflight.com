@@ -23,12 +23,9 @@ const weatherService = new WeatherService(weatherRepository);
  */
 const handler = async (event) => {
     try {
-        console.log("Starting to process weather averages");
         await weatherService.ProcessAverages();
-        console.log("Successfully processed weather averages");
         return responseFactory.createApiResponse(200, "Successfully processed weather averages");
     } catch (err) {
-        console.error("Error processing weather averages:", err);
         return responseFactory.createApiResponse(500, `Internal server error: ${err.message}`);
     }
 };

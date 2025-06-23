@@ -29,7 +29,6 @@ export class WeatherService {
     async ProcessAverages(): Promise<void> {
         // list all records in the table
         const current = await this._weatherRepository.ListAll();
-        console.log(`Found ${current.length} current records`);
 
         // group the records by deviceId
         const groupedByDevice = current.reduce((groups, record) => {
@@ -44,18 +43,14 @@ export class WeatherService {
         console.log(`Found ${Object.keys(groupedByDevice).length} unique devices`);
         let processed: string[] = [];
         for (const [deviceId, records] of Object.entries(groupedByDevice)) {
-            console.log(`Device ${deviceId} has ${records.length} current records`);
             const averageWeather = AverageWeatherData.create(records.map(x => x.data));
             const id = nanoid();
             const payload = new WeatherRecord<AverageWeatherData>(id, records[0].timestamp, averageWeather, records[0].device);
-            console.log(`Saving average for device ${deviceId}...`);
-            console.log(payload);
             await this._weatherRepository.SaveAverage(payload);
             const ids = records.map(x => x.id);
             processed = processed.concat(ids);
         }
 
-        console.log(`Processed ${processed.length} records`);
         console.log(`Deleting ${current.length - processed.length} records from the database...`);
         console.log(processed);
         await this._weatherRepository.DeleteAll(processed);
