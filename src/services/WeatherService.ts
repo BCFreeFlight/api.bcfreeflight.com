@@ -61,7 +61,7 @@ export class WeatherService {
      * @param {CurrentWeatherData} data - The actual weather data readings.
      * @return {Promise<WeatherRecord<CurrentWeatherData>>} A promise that resolves to a confirmation object containing details of the saved data.
      */
-    async SaveCurrentWeatherData(
+    async SaveCurrent(
         device: DeviceInfo,
         data: CurrentWeatherData
     ): Promise<string> {

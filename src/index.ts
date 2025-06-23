@@ -15,12 +15,12 @@ export {DeviceService} from './services/DeviceService';
 export {QueryParser} from './util/QueryParser';
 
 // Data Transfer Objects
-export {CurrentWeatherRecord} from './data/dtos/CurrentWeatherRecord';
 export {DeviceInfo} from './data/dtos/DeviceInfo';
 export {CurrentWeatherData} from './data/dtos/CurrentWeatherData';
 export {DevicePreview} from './data/dtos/DevicePreview';
 export {Range} from './data/dtos/Range';
 export {AverageWeatherData} from './data/dtos/AverageWeatherData';
+export {WeatherRecord} from './data/dtos/WeatherRecord';
 
 
 // Import all exports to create a default export
@@ -33,10 +33,10 @@ import {DeviceService} from './services/DeviceService';
 import {QueryParser} from './util/QueryParser';
 import {DeviceInfo} from './data/dtos/DeviceInfo';
 import {CurrentWeatherData} from './data/dtos/CurrentWeatherData';
-import {CurrentWeatherRecord} from './data/dtos/CurrentWeatherRecord';
 import {DevicePreview} from './data/dtos/DevicePreview';
 import {Range} from "./data/dtos/Range";
 import {AverageWeatherData} from "./data/dtos/AverageWeatherData";
+import {WeatherRecord} from "./data/dtos/WeatherRecord";
 
 // Export everything as default as well
 const bcfreeflight = {
@@ -47,12 +47,12 @@ const bcfreeflight = {
     WeatherService,
     DeviceService,
     QueryParser,
-    WeatherRecord: CurrentWeatherRecord,
     DeviceInfo,
     CurrentWeatherData,
     AverageWeatherData,
     Range,
-    DevicePreview
+    DevicePreview,
+    WeatherRecord
 };
 
 export default bcfreeflight;

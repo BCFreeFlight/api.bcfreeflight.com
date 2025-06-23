@@ -5,14 +5,14 @@ import {AwsLambdaResponseFactory, QueryParser, AwsDynamoDBDeviceRepository, AwsD
 // Table names
 const deviceTable = "BCFF_Devices";
 const liveWeather = "BCFF_LiveWeather";
-const weather = "BCFF_Weather";
+const averageWeather = "BCFF_Weather";
 
 // Create dependencies
 const dbClient = new DynamoDBClient({region: process.env.AWS_REGION});
 const responseFactory = new AwsLambdaResponseFactory();
 const queryParser = new QueryParser();
 const deviceRepository = new AwsDynamoDBDeviceRepository(dbClient, deviceTable);
-const weatherRepository = new AwsDynamoDBWeatherRepository(dbClient, liveWeather, weather);
+const weatherRepository = new AwsDynamoDBWeatherRepository(dbClient, liveWeather, averageWeather);
 const weatherService = new WeatherService(weatherRepository);
 const deviceService = new DeviceService(deviceRepository);
 

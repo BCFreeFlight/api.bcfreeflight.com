@@ -41,6 +41,7 @@ export class AverageWeatherData {
      * @param {Range} windgustmph - Wind gust speed in miles per hour.
      * @param {Range} windspeedmph - Wind speed in miles per hour.
      * @param {Range} yearlyrainin - Yearly rainfall amount in inches.
+     * @param {number} recordCount - Number of records contributing to the average.
      */
     constructor(
         public readonly baromabsin: Range,
@@ -72,7 +73,8 @@ export class AverageWeatherData {
         public readonly winddir: Range,
         public readonly windgustmph: Range,
         public readonly windspeedmph: Range,
-        public readonly yearlyrainin: Range
+        public readonly yearlyrainin: Range,
+        public readonly recordCount: number
     ) {
     }
 
@@ -120,7 +122,8 @@ export class AverageWeatherData {
             Range.create(weatherDataArray.map(data => data.winddir)),
             Range.create(weatherDataArray.map(data => data.windgustmph)),
             Range.create(weatherDataArray.map(data => data.windspeedmph)),
-            Range.create(weatherDataArray.map(data => data.yearlyrainin))
+            Range.create(weatherDataArray.map(data => data.yearlyrainin)),
+            weatherDataArray.length
         );
     }
 }

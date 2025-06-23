@@ -1,22 +1,36 @@
 // index.mjs
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
-import {AwsLambdaResponseFactory, QueryParser, DynamoDBDeviceRepository, DynamoDBWeatherRepository, WeatherService, DeviceService} from "bcfreeflight";
+import {AwsLambdaResponseFactory, AwsDynamoDBWeatherRepository, WeatherService} from "bcfreeflight";
 
 // Table names
-const deviceTable = "BCFF_Devices";
-const weatherTable = "BCFF_Weather";
+const liveWeather = "BCFF_LiveWeather";
+const averageWeather = "BCFF_Weather";
 
 // Create dependencies
 const dbClient = new DynamoDBClient({region: process.env.AWS_REGION});
 const responseFactory = new AwsLambdaResponseFactory();
-const queryParser = new QueryParser();
-const deviceRepository = new DynamoDBDeviceRepository(dbClient, deviceTable);
-const weatherRepository = new DynamoDBWeatherRepository(dbClient, weatherTable);
+const weatherRepository = new AwsDynamoDBWeatherRepository(dbClient, liveWeather, averageWeather);
 const weatherService = new WeatherService(weatherRepository);
-const deviceService = new DeviceService(deviceRepository);
 
+/**
+ * Lambda handler that processes weather averages.
+ * This function loads all data from the BCFF_LiveWeather table,
+ * creates a single record with all the averages, saves it to the BCFF_Weather table,
+ * and then deletes all the processed records from the BCFF_LiveWeather table.
+ *
+ * @param {Object} event - The AWS Lambda event object
+ * @return {Promise<Object>} Returns a formatted HTTP response object with a status code and message
+ */
 const handler = async (event) => {
-
+    try {
+        console.log("Starting to process weather averages");
+        await weatherService.ProcessAverages();
+        console.log("Successfully processed weather averages");
+        return responseFactory.createApiResponse(200, "Successfully processed weather averages");
+    } catch (err) {
+        console.error("Error processing weather averages:", err);
+        return responseFactory.createApiResponse(500, `Internal server error: ${err.message}`);
+    }
 };
 
 export {handler};
