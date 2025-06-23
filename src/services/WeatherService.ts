@@ -40,10 +40,9 @@ export class WeatherService {
             return groups;
         }, {} as Record<string, typeof current>);
 
-        console.log(`Found ${Object.keys(groupedByDevice).length} unique devices`);
         let processed: string[] = [];
         for (const [deviceId, records] of Object.entries(groupedByDevice)) {
-            const averageWeather = AverageWeatherData.create(records.map(x => x.data));
+            const averageWeather = AverageWeatherData.Create(records.map(x => x.data));
             const id = nanoid();
             const payload = new WeatherRecord<AverageWeatherData>(id, records[0].timestamp, averageWeather, records[0].device);
             await this._weatherRepository.SaveAverage(payload);
@@ -70,7 +69,8 @@ export class WeatherService {
         const timestamp = new Date().toISOString();
         const id = nanoid();
         const payload = new WeatherRecord<CurrentWeatherData>(
-            id, timestamp,
+            id,
+            timestamp,
             data,
             device
         );

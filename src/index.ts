@@ -19,11 +19,12 @@ export {DeviceInfo} from './data/dtos/DeviceInfo';
 export {CurrentWeatherData} from './data/dtos/CurrentWeatherData';
 export {DevicePreview} from './data/dtos/DevicePreview';
 export {Range} from './data/dtos/Range';
+export {ReadOnlyDateTimeRange} from './data/dtos/ReadOnlyDateTimeRange';
 export {AverageWeatherData} from './data/dtos/AverageWeatherData';
 export {WeatherRecord} from './data/dtos/WeatherRecord';
 
 
-// Import all exports to create a default export
+// Import all exports to Create a default export
 import {AwsLambdaResponseFactory} from './http/AwsLambdaResponseFactory';
 import {AwsLambdaApiResponse} from './http/AwsLambdaApiResponse';
 import {AwsDynamoDBDeviceRepository} from './data/AwsDynamoDBDeviceRepository';
@@ -35,6 +36,7 @@ import {DeviceInfo} from './data/dtos/DeviceInfo';
 import {CurrentWeatherData} from './data/dtos/CurrentWeatherData';
 import {DevicePreview} from './data/dtos/DevicePreview';
 import {Range} from "./data/dtos/Range";
+import {ReadOnlyDateTimeRange} from "./data/dtos/ReadOnlyDateTimeRange";
 import {AverageWeatherData} from "./data/dtos/AverageWeatherData";
 import {WeatherRecord} from "./data/dtos/WeatherRecord";
 
@@ -51,6 +53,7 @@ const bcfreeflight = {
     CurrentWeatherData,
     AverageWeatherData,
     Range,
+    ReadOnlyDateTimeRange,
     DevicePreview,
     WeatherRecord
 };

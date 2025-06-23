@@ -1,5 +1,6 @@
 import {Range} from './Range';
 import {CurrentWeatherData} from './CurrentWeatherData';
+import {ReadOnlyDateTimeRange} from './ReadOnlyDateTimeRange';
 
 /**
  * Represents the average weather data collected from a weather station over a period.
@@ -42,6 +43,7 @@ export class AverageWeatherData {
      * @param {Range} windspeedmph - Wind speed in miles per hour.
      * @param {Range} yearlyrainin - Yearly rainfall amount in inches.
      * @param {number} recordCount - Number of records contributing to the average.
+     * @param {ReadOnlyDateTimeRange} dateTimeRangeUtc - The range of timestamps covered by this average data in utc.
      */
     constructor(
         public readonly baromabsin: Range,
@@ -74,7 +76,8 @@ export class AverageWeatherData {
         public readonly windgustmph: Range,
         public readonly windspeedmph: Range,
         public readonly yearlyrainin: Range,
-        public readonly recordCount: number
+        public readonly recordCount: number,
+        public readonly dateTimeRangeUtc: ReadOnlyDateTimeRange
     ) {
     }
 
@@ -84,13 +87,16 @@ export class AverageWeatherData {
      * @param {CurrentWeatherData[]} weatherDataArray - An array of CurrentWeatherData objects to calculate averages from.
      * @return {AverageWeatherData} An AverageWeatherData object containing Range objects for each numeric property.
      */
-    static create(weatherDataArray: CurrentWeatherData[]): AverageWeatherData {
+    static Create(weatherDataArray: CurrentWeatherData[]): AverageWeatherData {
         if (!weatherDataArray || weatherDataArray.length === 0) {
-            throw new Error('Cannot create AverageWeatherData from empty array');
+            throw new Error('Cannot Create AverageWeatherData from empty array');
         }
 
         // Use the first item for string values
         const firstItem = weatherDataArray[0];
+
+        // Create a date time range from the timestamps in the data array
+        const dateTimeRange = ReadOnlyDateTimeRange.Create(weatherDataArray.map(data => data.dateutc));
 
         return new AverageWeatherData(
             Range.create(weatherDataArray.map(data => data.baromabsin)),
@@ -123,7 +129,8 @@ export class AverageWeatherData {
             Range.create(weatherDataArray.map(data => data.windgustmph)),
             Range.create(weatherDataArray.map(data => data.windspeedmph)),
             Range.create(weatherDataArray.map(data => data.yearlyrainin)),
-            weatherDataArray.length
+            weatherDataArray.length,
+            dateTimeRange
         );
     }
 }
