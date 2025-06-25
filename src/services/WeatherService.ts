@@ -1,5 +1,4 @@
 // WeatherService.ts
-import {nanoid} from "nanoid";
 import {DeviceInfo} from "../data/dtos/DeviceInfo";
 import {CurrentWeatherData} from "../data/dtos/CurrentWeatherData";
 import {AwsDynamoDBWeatherRepository} from "../data/AwsDynamoDBWeatherRepository";
@@ -43,9 +42,7 @@ export class WeatherService {
         let processed: string[] = [];
         for (const [deviceId, records] of Object.entries(groupedByDevice)) {
             const averageWeather = AverageWeatherData.Create(records.map(x => x.data));
-            const id = nanoid();
-            const timestamp = new Date().toISOString();
-            const payload = new WeatherRecord<AverageWeatherData>(id, timestamp, averageWeather, records[0].device);
+            const payload = WeatherRecord.Create<AverageWeatherData>(averageWeather, records[0].device);
             await this._weatherRepository.SaveAverage(payload);
             const ids = records.map(x => x.id);
             processed = processed.concat(ids);
@@ -67,14 +64,7 @@ export class WeatherService {
         device: DeviceInfo,
         data: CurrentWeatherData
     ): Promise<string> {
-        const timestamp = new Date().toISOString();
-        const id = nanoid();
-        const payload = new WeatherRecord<CurrentWeatherData>(
-            id,
-            timestamp,
-            data,
-            device
-        );
+        const payload = WeatherRecord.Create<CurrentWeatherData>(data, device);
 
         return await this._weatherRepository.SaveCurrent(payload);
     }
