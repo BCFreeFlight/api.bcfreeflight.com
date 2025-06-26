@@ -50,7 +50,7 @@ const handler = async (event) => {
         console.log(`Retrieved ${weatherResults.length} weather results`);
 
         console.log("Get-weather handler completed successfully");
-        return responseFactory.createApiResponse(200, weatherResults);
+        return weatherResults;
     } catch (err) {
         console.error("Error in get-weather handler:", err);
         return responseFactory.createApiResponse(500, `Internal server error: ${err.message}`);
