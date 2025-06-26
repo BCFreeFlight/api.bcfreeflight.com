@@ -4,6 +4,7 @@ import {CurrentWeatherData} from "../data/dtos/CurrentWeatherData";
 import {AwsDynamoDBWeatherRepository} from "../data/AwsDynamoDBWeatherRepository";
 import {WeatherRecord} from "../data/dtos/WeatherRecord";
 import {AverageWeatherData} from "../data/dtos/AverageWeatherData";
+import {WeatherResult} from "../data/dtos/WeatherResult";
 
 /**
  * Service for weather-related operations.
@@ -60,7 +61,6 @@ export class WeatherService {
             await this._weatherRepository.SaveAverage(payload);
             console.log(`Successfully saved average for device ${deviceId}`);
 
-            const ids = records.map(x => x.deviceId);
             processed.push(deviceId);
             console.log(`Added ${deviceId} to processed list`);
         }
@@ -93,6 +93,38 @@ export class WeatherService {
         console.log(`Saving current weather data for device ${device.id}`);
         await this._weatherRepository.SaveCurrent(payload);
         console.log(`Successfully saved current weather data for device ${device.id}`);
+    }
+
+    /**
+     * Gets weather data for a specific device, either the most recent record or records for a specific date.
+     * The data is transformed into a simplified WeatherResult format that contains only deviceId and data.
+     *
+     * @param {string} deviceId - The ID of the device to retrieve weather data for.
+     * @param {string} [localDate] - Optional. The local date to retrieve weather data for in MM-DD-YYYY format.
+     * @return {Promise<WeatherResult[]>} A promise that resolves to an array of weather results.
+     *         If a localDate is provided, returns all records for that date. Otherwise, returns only the most recent record.
+     */
+    async Get(deviceId: string, localDate?: string): Promise<WeatherResult[]> {
+        console.log(`Starting Get method for device ${deviceId}${localDate ? ` and date ${localDate}` : ''}`);
+
+        let records: WeatherRecord<AverageWeatherData>[];
+
+        if (localDate) {
+            console.log(`Retrieving weather data for device ${deviceId} on date ${localDate}`);
+            records = await this._weatherRepository.List(deviceId, localDate);
+            console.log(`Retrieved ${records.length} records for device ${deviceId} on date ${localDate}`);
+        } else {
+            console.log(`Retrieving most recent weather data for device ${deviceId}`);
+            records = await this._weatherRepository.Get(deviceId);
+            console.log(`Retrieved ${records.length} records for device ${deviceId}`);
+        }
+
+        // Transform WeatherRecord array into WeatherResult array
+        console.log(`Transforming ${records.length} records to WeatherResult format`);
+        const results = records.map(record => new WeatherResult(record.deviceId, record.data));
+        console.log(`Transformation complete, returning ${results.length} WeatherResult objects`);
+
+        return results;
     }
 
     private readonly _weatherRepository: AwsDynamoDBWeatherRepository;

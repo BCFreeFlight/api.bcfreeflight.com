@@ -206,6 +206,44 @@ export class AwsDynamoDBWeatherRepository {
         return records;
     }
 
+    /**
+     * Gets the most recent weather record from the average weather table for the specified device.
+     *
+     * @param {string} deviceId - The ID of the device to retrieve the record for.
+     * @return {Promise<WeatherRecord<AverageWeatherData>[]>} A promise that resolves to an array containing
+     *                                                        only the most recent weather record for the device.
+     */
+    async Get(deviceId: string): Promise<WeatherRecord<AverageWeatherData>[]> {
+        console.log(`[Repository] Get: Querying most recent average weather data for device ${deviceId}`);
+        const queryCommand = new QueryCommand({
+            TableName: this._averageWeatherTable,
+            KeyConditionExpression: '#deviceId = :deviceId',
+            ExpressionAttributeNames: {
+                '#deviceId': 'deviceId'
+            },
+            ExpressionAttributeValues: marshall({
+                ':deviceId': deviceId
+            }),
+            ScanIndexForward: false, // false = descending order (newest first)
+            Limit: 1 // Limit to only the most recent record
+        });
+
+        console.log(`[Repository] Get: Sending query command to table ${this._averageWeatherTable}`);
+        const result = await this._client.send(queryCommand);
+        console.log(`[Repository] Get: Query command completed`);
+
+        if (!result.Items || result.Items.length === 0) {
+            console.log(`[Repository] Get: No items found for device ${deviceId}`);
+            return [];
+        }
+
+        // Convert DynamoDB items to WeatherRecord objects and return them
+        // The results are already sorted by timestamp (newest first) due to ScanIndexForward: false
+        const records = result.Items.map(item => unmarshall(item) as WeatherRecord<AverageWeatherData>);
+        console.log(`[Repository] Get: Retrieved most recent record for device ${deviceId}`);
+        return records;
+    }
+
     private readonly _client: DynamoDBDocumentClient;
     private readonly _currentWeatherTable: string;
     private readonly _averageWeatherTable: string;
