@@ -22,6 +22,7 @@ export {Range} from './data/dtos/Range';
 export {ReadOnlyDateTimeRange} from './data/dtos/ReadOnlyDateTimeRange';
 export {AverageWeatherData} from './data/dtos/AverageWeatherData';
 export {WeatherRecord} from './data/dtos/WeatherRecord';
+export {WeatherResult} from './data/dtos/WeatherResult';
 
 
 // Import all exports to Create a default export
@@ -39,6 +40,7 @@ import {Range} from "./data/dtos/Range";
 import {ReadOnlyDateTimeRange} from "./data/dtos/ReadOnlyDateTimeRange";
 import {AverageWeatherData} from "./data/dtos/AverageWeatherData";
 import {WeatherRecord} from "./data/dtos/WeatherRecord";
+import {WeatherResult} from "./data/dtos/WeatherResult";
 
 // Export everything as default as well
 const bcfreeflight = {
@@ -55,7 +57,8 @@ const bcfreeflight = {
     Range,
     ReadOnlyDateTimeRange,
     DevicePreview,
-    WeatherRecord
+    WeatherRecord,
+    WeatherResult
 };
 
 export default bcfreeflight;
