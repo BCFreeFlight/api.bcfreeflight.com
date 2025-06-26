@@ -1,7 +1,6 @@
 import {CurrentWeatherData} from "./CurrentWeatherData";
 import {AverageWeatherData} from "./AverageWeatherData";
 import {DeviceInfo} from "./DeviceInfo";
-import {nanoid} from "nanoid";
 
 /**
  * Represents a single summarized weather record that combines processed
@@ -10,16 +9,16 @@ import {nanoid} from "nanoid";
 export class WeatherRecord<TWeatherData extends CurrentWeatherData | AverageWeatherData> {
 
     /**
-     * Constructor for creating an instance of the WeatherDataRecord class.
+     * Constructor for creating an instance of the class with weather data and device information.
      *
-     * @param {string} id - The unique identifier for the record.
-     * @param {string} timestamp - The timestamp when the record was created.
-     * @param {string} localDate - The local date of the record in the device's timezone (date portion only).
-     * @param {CurrentWeatherData | AverageWeatherData} data - The weather data associated with the record.
-     * @param {DeviceInfo} device - The device information from which the record was collected.
+     * @param {string} deviceId - Unique identifier for the device.
+     * @param {string} timestamp - The timestamp of when the data was recorded.
+     * @param {string} localDate - The local date corresponding to the data recording.
+     * @param {TWeatherData extends CurrentWeatherData | AverageWeatherData} data - Weather data collected from the device.
+     * @param {DeviceInfo} device - Information about the device from which the data was collected.
      */
     constructor(
-        public readonly id: string,
+        public readonly deviceId: string,
         public readonly timestamp: string,
         public readonly localDate: string,
         public readonly data: TWeatherData,
@@ -29,7 +28,7 @@ export class WeatherRecord<TWeatherData extends CurrentWeatherData | AverageWeat
 
     /**
      * Creates a new WeatherRecord with an auto-generated ID and current date.
-     * 
+     *
      * @param {TWeatherData extends CurrentWeatherData | AverageWeatherData} data - The weather data associated with the record.
      * @param {DeviceInfo} device - The device information from which the record was collected.
      * @returns {WeatherRecord<TWeatherData extends CurrentWeatherData | AverageWeatherData>} A new WeatherRecord instance.
@@ -38,7 +37,6 @@ export class WeatherRecord<TWeatherData extends CurrentWeatherData | AverageWeat
         data: TWeatherData,
         device: DeviceInfo
     ): WeatherRecord<TWeatherData> {
-        const id = nanoid();
         const date = new Date();
         const timestamp = date.toISOString();
         const localDate = new Intl.DateTimeFormat('en-US', {
@@ -47,7 +45,6 @@ export class WeatherRecord<TWeatherData extends CurrentWeatherData | AverageWeat
             month: '2-digit',
             day: '2-digit'
         }).format(date).split('/').join('-');
-
-        return new WeatherRecord<TWeatherData>(id, timestamp, localDate, data, device);
+        return new WeatherRecord<TWeatherData>(device.id, timestamp, localDate, data, device);
     }
 }

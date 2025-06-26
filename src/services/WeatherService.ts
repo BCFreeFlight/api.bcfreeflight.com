@@ -27,11 +27,11 @@ export class WeatherService {
      */
     async ProcessAverages(): Promise<void> {
         // list all records in the table
-        const current = await this._weatherRepository.ListAll();
+        const current = await this._weatherRepository.ListCurrent();
 
         // group the records by deviceId
         const groupedByDevice = current.reduce((groups, record) => {
-            const deviceId = record.device.id;
+            const deviceId = record.deviceId;
             if (!groups[deviceId]) {
                 groups[deviceId] = [];
             }
@@ -44,8 +44,8 @@ export class WeatherService {
             const averageWeather = AverageWeatherData.Create(records.map(x => x.data));
             const payload = WeatherRecord.Create<AverageWeatherData>(averageWeather, records[0].device);
             await this._weatherRepository.SaveAverage(payload);
-            const ids = records.map(x => x.id);
-            processed = processed.concat(ids);
+            const ids = records.map(x => x.deviceId);
+            processed.push(deviceId);
         }
 
         console.log(`Deleting ${current.length - processed.length} records from the database...`);
@@ -63,10 +63,10 @@ export class WeatherService {
     async SaveCurrent(
         device: DeviceInfo,
         data: CurrentWeatherData
-    ): Promise<string> {
+    ): Promise<void> {
         const payload = WeatherRecord.Create<CurrentWeatherData>(data, device);
-
-        return await this._weatherRepository.SaveCurrent(payload);
+        console.log(payload);
+        await this._weatherRepository.SaveCurrent(payload);
     }
 
     private readonly _weatherRepository: AwsDynamoDBWeatherRepository;

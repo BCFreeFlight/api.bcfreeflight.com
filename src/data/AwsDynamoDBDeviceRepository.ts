@@ -4,10 +4,9 @@ import {unmarshall} from "@aws-sdk/util-dynamodb";
 import {DynamoDBDocumentClient} from '@aws-sdk/lib-dynamodb';
 import {DeviceInfo} from "./dtos/DeviceInfo";
 
-
 /**
  * A repository for interacting with a table containing device data.
- * This repository provides a method to get devices by their id.
+ * This repository provides a method to get devices by their deviceId.
  */
 export class AwsDynamoDBDeviceRepository {
 
@@ -27,12 +26,12 @@ export class AwsDynamoDBDeviceRepository {
     }
 
     /**
-     * Finds and retrieves the record associated with the provided id from the table.
-     * The uploadKey parameter is now treated as the table's id column.
+     * Finds and retrieves the record associated with the provided deviceId from the table.
+     * The uploadKey parameter is now treated as the table's deviceId column.
      *
-     * @param {string} id - The id of the record to retrieve (previously this was the upload key).
+     * @param {string} id - The deviceId of the record to retrieve (previously this was the upload key).
      * @return {Promise<Record<string, any>|null>} A promise that resolves to the retrieved item or null if not found.
-     * @throws {Error} Throws an error if the uploadKey (id) is not provided.
+     * @throws {Error} Throws an error if the uploadKey (deviceId) is not provided.
      */
     async findById(id: string): Promise<DeviceInfo | null> {
         if (!id) throw new Error("uploadKey is required");

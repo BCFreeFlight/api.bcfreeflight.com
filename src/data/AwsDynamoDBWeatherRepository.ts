@@ -1,5 +1,5 @@
 // DynamoDBWeatherRepository.ts
-import {PutItemCommand, DynamoDBClient, ScanCommand, BatchWriteItemCommand} from "@aws-sdk/client-dynamodb";
+import {PutItemCommand, DynamoDBClient, ScanCommand, QueryCommand, BatchWriteItemCommand} from "@aws-sdk/client-dynamodb";
 import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
 import {DynamoDBDocumentClient} from '@aws-sdk/lib-dynamodb';
 import {WeatherRecord} from "./dtos/WeatherRecord";
@@ -32,7 +32,7 @@ export class AwsDynamoDBWeatherRepository {
      *
      * @return {Promise<WeatherRecord<CurrentWeatherData>[]>} A promise that resolves to an object mapping device IDs to arrays of weather records.
      */
-    async ListAll(): Promise<WeatherRecord<CurrentWeatherData>[]> {
+    async ListCurrent(): Promise<WeatherRecord<CurrentWeatherData>[]> {
         const scanCommand = new ScanCommand({
             TableName: this._currentWeatherTable
         });
@@ -52,13 +52,12 @@ export class AwsDynamoDBWeatherRepository {
      * @param {WeatherRecord<AverageWeatherData>} input - The current weather record to be saved. This object contains the data to persist including an identifier and other weather-related properties.
      * @return {Promise<string>} A promise that resolves to the ID of the saved weather record.
      */
-    async SaveCurrent(input: WeatherRecord<CurrentWeatherData>): Promise<string> {
+    async SaveCurrent(input: WeatherRecord<CurrentWeatherData>): Promise<void> {
         const putCommand = new PutItemCommand({
             TableName: this._currentWeatherTable,
             Item: marshall(input, {removeUndefinedValues: true, convertClassInstanceToMap: true})
         });
         await this._client.send(putCommand);
-        return input.id;
     }
 
     /**
@@ -67,51 +66,111 @@ export class AwsDynamoDBWeatherRepository {
      * @param {WeatherRecord} input - The weather record object to be saved. It includes weather attributes and an identifier.
      * @return {Promise<string>} A promise that resolves to the identifier of the saved record.
      */
-    async SaveAverage(input: WeatherRecord<AverageWeatherData>): Promise<string> {
+    async SaveAverage(input: WeatherRecord<AverageWeatherData>): Promise<void> {
         const putCommand = new PutItemCommand({
             TableName: this._averageWeatherTable,
             Item: marshall(input, {removeUndefinedValues: true, convertClassInstanceToMap: true})
         });
         await this._client.send(putCommand);
-        return input.id;
     }
 
     /**
      * Deletes all items with the specified IDs from the current weather table.
      * The deletion is performed in batches due to the database's batch write limit.
      *
-     * @param {string[]} ids - An array of IDs representing the items to be deleted. If the array is empty, the method returns without performing any action.
+     * @param {string[]} deviceIds - An array of IDs representing the items to be deleted. If the array is empty, the method returns without performing any action.
      * @return {Promise<void>} A promise that resolves once all specified items have been deleted.
      */
-    async DeleteAll(ids: string[]): Promise<void> {
-        if (ids.length === 0) {
+    async DeleteAll(deviceIds: string[]): Promise<void> {
+        if (deviceIds.length === 0) {
             return;
         }
 
-        // Delete items in batches (DynamoDB batch write limit is 25 items)
-        const batchSize = 25;
+        for (const deviceId of deviceIds) {
+            let lastEvaluatedKey = undefined;
+            let allItems: any[] = [];
 
-        for (let i = 0; i < ids.length; i += batchSize) {
-            const batch = ids.slice(i, i + batchSize);
+            // Query all items for the current deviceId, handling pagination
+            do {
+                const queryCommand: QueryCommand = new QueryCommand({
+                    TableName: this._currentWeatherTable,
+                    KeyConditionExpression: "deviceId = :deviceId",
+                    ExpressionAttributeValues: marshall({
+                        ':deviceId': deviceId
+                    }),
+                    ExclusiveStartKey: lastEvaluatedKey
+                });
 
-            const deleteRequests = batch.map(id => ({
-                DeleteRequest: {
-                    Key: marshall({id})
+                const queryResult = await this._client.send(queryCommand);
+
+                if (queryResult.Items) {
+                    allItems = allItems.concat(queryResult.Items);
                 }
-            }));
+                lastEvaluatedKey = queryResult.LastEvaluatedKey;
+            } while (lastEvaluatedKey);
 
-            const batchWriteCommand = new BatchWriteItemCommand({
-                RequestItems: {
-                    [this._currentWeatherTable]: deleteRequests
-                }
-            });
+            const batchSize = 25;
 
-            await this._client.send(batchWriteCommand);
+            for (let i = 0; i < allItems.length; i += batchSize) {
+                const batch = allItems.slice(i, i + batchSize);
+
+                const deleteRequests = batch.map(item => ({
+                    DeleteRequest: {
+                        Key: {
+                            deviceId: item.deviceId,
+                            timestamp: item.timestamp  // Include the sort key
+                        }
+                    }
+                }));
+
+                const batchWriteCommand = new BatchWriteItemCommand({
+                    RequestItems: {
+                        [this._currentWeatherTable]: deleteRequests
+                    }
+                });
+
+                await this._client.send(batchWriteCommand);
+            }
         }
+
+    }
+
+    /**
+     * Lists weather records from the average weather table based on the provided parameters.
+     *
+     * @param {string} deviceId - The ID of the device to filter records by. This is a required parameter.
+     * @param {string} localDate - The local date parameter in the format MM-DD-YYYY to filter records by.
+     * @return {Promise<WeatherRecord<AverageWeatherData>[]>} A promise that resolves to an array of weather records
+     *                                                        ordered by timestamp with newest records first.
+     */
+    async List(deviceId: string, localDate: string): Promise<WeatherRecord<AverageWeatherData>[]> {
+        const queryCommand = new QueryCommand({
+            TableName: this._averageWeatherTable,
+            KeyConditionExpression: '#deviceId = :deviceId',
+            FilterExpression: '#localDate = :localDate',
+            ExpressionAttributeNames: {
+                '#deviceId': 'deviceId',
+                '#localDate': 'localDate'
+            },
+            ExpressionAttributeValues: marshall({
+                ':deviceId': deviceId,
+                ':localDate': localDate
+            }),
+            ScanIndexForward: false, // false = descending order (newest first)
+        });
+
+        const result = await this._client.send(queryCommand);
+
+        if (!result.Items || result.Items.length === 0) {
+            return [];
+        }
+
+        // Convert DynamoDB items to WeatherRecord objects and return them
+        // The results are already sorted by timestamp (newest first) due to ScanIndexForward: false
+        return result.Items.map(item => unmarshall(item) as WeatherRecord<AverageWeatherData>);
     }
 
     private readonly _client: DynamoDBDocumentClient;
     private readonly _currentWeatherTable: string;
     private readonly _averageWeatherTable: string;
-
 }
