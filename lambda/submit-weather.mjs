@@ -1,4 +1,4 @@
-// index.mjs
+// submit-weather.mjs
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {AwsLambdaResponseFactory, QueryParser, AwsDynamoDBDeviceRepository, AwsDynamoDBWeatherRepository, WeatherService, DeviceService} from "bcfreeflight";
 
