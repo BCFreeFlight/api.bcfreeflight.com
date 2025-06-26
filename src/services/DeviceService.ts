@@ -23,7 +23,15 @@ export class DeviceService {
      * @return {Promise<Record<string, any>|null>} A promise that resolves to the entity object if found, or null if not found.
      */
     async getById(id: string): Promise<DeviceInfo | null> {
-        return await this._deviceRepository.findById(id);
+        console.log(`Starting getById method for device ${id}`);
+        console.log(`Calling deviceRepository.findById for device ${id}`);
+        const device = await this._deviceRepository.findById(id);
+        if (device) {
+            console.log(`Successfully retrieved device ${id}`);
+        } else {
+            console.log(`Device ${id} not found`);
+        }
+        return device;
     }
 
     private readonly _deviceRepository: AwsDynamoDBDeviceRepository;

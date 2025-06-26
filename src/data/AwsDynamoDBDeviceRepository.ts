@@ -34,7 +34,11 @@ export class AwsDynamoDBDeviceRepository {
      * @throws {Error} Throws an error if the uploadKey (deviceId) is not provided.
      */
     async findById(id: string): Promise<DeviceInfo | null> {
-        if (!id) throw new Error("uploadKey is required");
+        console.log(`[Repository] findById: Looking up device with id ${id}`);
+        if (!id) {
+            console.log(`[Repository] findById: Error - uploadKey is required`);
+            throw new Error("uploadKey is required");
+        }
 
         const getCommand = new GetItemCommand({
             TableName: this._tableName,
@@ -43,8 +47,17 @@ export class AwsDynamoDBDeviceRepository {
             }
         });
 
+        console.log(`[Repository] findById: Sending get command to table ${this._tableName}`);
         const result = await this._client.send(getCommand);
-        return result.Item ? this._factory(unmarshall(result.Item)) : null;
+        console.log(`[Repository] findById: Get command completed`);
+
+        if (!result.Item) {
+            console.log(`[Repository] findById: No device found with id ${id}`);
+            return null;
+        }
+
+        console.log(`[Repository] findById: Device found with id ${id}`);
+        return this._factory(unmarshall(result.Item));
     }
 
     private _factory(data: Record<string, any>): DeviceInfo {
