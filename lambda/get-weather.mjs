@@ -1,9 +1,8 @@
 // get-weather.mjs
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
-import {AwsLambdaResponseFactory, QueryParser, AwsDynamoDBDeviceRepository, AwsDynamoDBWeatherRepository, WeatherService} from "bcfreeflight";
+import {AwsLambdaResponseFactory, QueryParser, AwsDynamoDBWeatherRepository, WeatherService} from "bcfreeflight";
 
 // Table names
-const deviceTable = "BCFF_Devices";
 const liveWeather = "BCFF_LiveWeather";
 const averageWeather = "BCFF_Weather";
 
@@ -11,7 +10,6 @@ const averageWeather = "BCFF_Weather";
 const dbClient = new DynamoDBClient({region: process.env.AWS_REGION});
 const responseFactory = new AwsLambdaResponseFactory();
 const queryParser = new QueryParser();
-const deviceRepository = new AwsDynamoDBDeviceRepository(dbClient, deviceTable);
 const weatherRepository = new AwsDynamoDBWeatherRepository(dbClient, liveWeather, averageWeather);
 const weatherService = new WeatherService(weatherRepository);
 
