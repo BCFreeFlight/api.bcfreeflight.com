@@ -22,11 +22,17 @@ const weatherService = new WeatherService(weatherRepository);
  * @return {Promise<Object>} Returns a formatted HTTP response object with a status code and message
  */
 const handler = async (event) => {
+    console.log("Starting process-averages handler");
     try {
+        console.log("Calling weatherService.ProcessAverages()");
         await weatherService.ProcessAverages();
+        console.log("Successfully completed weatherService.ProcessAverages()");
         return responseFactory.createApiResponse(200, "Successfully processed weather averages");
     } catch (err) {
+        console.error("Error in process-averages handler:", err);
         return responseFactory.createApiResponse(500, `Internal server error: ${err.message}`);
+    } finally {
+        console.log("Completed process-averages handler");
     }
 };
 

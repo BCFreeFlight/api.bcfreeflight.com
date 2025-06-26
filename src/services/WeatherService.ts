@@ -26,10 +26,15 @@ export class WeatherService {
      * @return {Promise<void>} A promise that resolves when the processing is complete.
      */
     async ProcessAverages(): Promise<void> {
+        console.log("Starting ProcessAverages method");
+
         // list all records in the table
+        console.log("Fetching current weather records from repository");
         const current = await this._weatherRepository.ListCurrent();
+        console.log(`Retrieved ${current.length} weather records`);
 
         // group the records by deviceId
+        console.log("Grouping records by deviceId");
         const groupedByDevice = current.reduce((groups, record) => {
             const deviceId = record.deviceId;
             if (!groups[deviceId]) {
@@ -38,19 +43,36 @@ export class WeatherService {
             groups[deviceId].push(record);
             return groups;
         }, {} as Record<string, typeof current>);
+        console.log(`Grouped records into ${Object.keys(groupedByDevice).length} devices`);
 
         let processed: string[] = [];
+        console.log("Starting to process each device group");
         for (const [deviceId, records] of Object.entries(groupedByDevice)) {
+            console.log(`Processing device ${deviceId} with ${records.length} records`);
+
+            console.log("Creating average weather data");
             const averageWeather = AverageWeatherData.Create(records.map(x => x.data));
+
+            console.log("Creating weather record payload");
             const payload = WeatherRecord.Create<AverageWeatherData>(averageWeather, records[0].device);
+
+            console.log(`Saving average weather data for device ${deviceId}`);
             await this._weatherRepository.SaveAverage(payload);
+            console.log(`Successfully saved average for device ${deviceId}`);
+
             const ids = records.map(x => x.deviceId);
             processed.push(deviceId);
+            console.log(`Added ${deviceId} to processed list`);
         }
+        console.log(`Completed processing ${processed.length} devices`);
 
         console.log(`Deleting ${current.length - processed.length} records from the database...`);
-        console.log(processed);
+        console.log("Processed devices:", processed);
+        console.log("Calling DeleteAll on repository");
         await this._weatherRepository.DeleteAll(processed);
+        console.log("Successfully deleted processed records");
+
+        console.log("ProcessAverages method completed successfully");
     }
 
     /**
@@ -64,9 +86,13 @@ export class WeatherService {
         device: DeviceInfo,
         data: CurrentWeatherData
     ): Promise<void> {
+        console.log(`Starting SaveCurrent method for device ${device.id}`);
+        console.log("Creating weather record payload");
         const payload = WeatherRecord.Create<CurrentWeatherData>(data, device);
-        console.log(payload);
+        console.log("Weather record payload created:", payload);
+        console.log(`Saving current weather data for device ${device.id}`);
         await this._weatherRepository.SaveCurrent(payload);
+        console.log(`Successfully saved current weather data for device ${device.id}`);
     }
 
     private readonly _weatherRepository: AwsDynamoDBWeatherRepository;
